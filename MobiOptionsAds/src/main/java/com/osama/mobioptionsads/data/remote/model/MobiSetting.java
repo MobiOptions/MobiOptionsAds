@@ -1,4 +1,4 @@
-package com.osama.mobioptionsads.data.model;
+package com.osama.mobioptionsads.data.remote.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

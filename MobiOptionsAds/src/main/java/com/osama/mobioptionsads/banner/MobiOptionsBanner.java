@@ -12,7 +12,10 @@ import com.facebook.ads.AdListener;
 import com.facebook.ads.AdView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
+import com.osama.mobioptionsads.MobiConstants;
+import com.osama.mobioptionsads.MobiOptionsAdsInit;
 import com.osama.mobioptionsads.base.BaseAd;
+import com.osama.mobioptionsads.data.remote.model.Advertisement;
 import com.unity3d.ads.UnityAds;
 import com.unity3d.services.banners.BannerErrorInfo;
 import com.unity3d.services.banners.BannerView;
@@ -20,50 +23,75 @@ import com.unity3d.services.banners.BannerView;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import static com.osama.mobioptionsads.MobiConstants.ADMOB_PROVIDER;
+import static com.osama.mobioptionsads.MobiConstants.DEFAULT_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.FACEBOOK_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.ROTATION_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.SETTINGS_ADS_ENABLED;
 import static com.osama.mobioptionsads.MobiConstants.TAG;
 import static com.osama.mobioptionsads.MobiConstants.UNITY_PROVIDER;
 
-public class MobiOptionsBanner extends BaseAd {
+public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
 
     private AdView facebookBanner = null;
     private com.google.android.gms.ads.AdView admobBanner = null;
     private BannerView unityBanner = null;
 
     private MobiBannerListener mobiBannerListener;
+    private MobiBannerListener thisBannerListener;
+    private boolean isDefaultProvider = false;
 
+    private boolean admobFailed = false;
+    private boolean facebookFailed = false;
+    private boolean unityFailed = false;
 
     private final ViewGroup bannerContainer;
     private final MobiOptionsBannerSize size;
 
+    private Advertisement advertisement;
+
     @Override
     protected void setupMobiSettings(@NotNull String adName) {
-        getMobiSetting().setAdsProvider(UNITY_PROVIDER);
-        getMobiSetting().setAdsEnabled(SETTINGS_ADS_ENABLED);
+        getHandler().post(() -> {
+            for (Advertisement ad : getMobiSetting().getAds()) {
+                if (ad.getName().equals(adName)) {
+                    advertisement = ad;
+                    switch (getMobiSetting().getAdsProvider()) {
+                        case FACEBOOK_PROVIDER:
+                            setBannerId(ad.getFacebookId());
+                            break;
+                        case ADMOB_PROVIDER:
+                            setBannerId(ad.getAdmobId());
+                            break;
+                        case UNITY_PROVIDER:
+                            setBannerId(ad.getUnityId());
+                            break;
+                        case DEFAULT_PROVIDER:
+                            getMobiSetting().setAdsProvider(ADMOB_PROVIDER);
+                            setBannerId(ad.getAdmobId());
+                            isDefaultProvider = true;
+                            break;
+                    }
+                    break;
+                }
+            }
+        });
     }
 
     public void setMobiBannerListener(MobiBannerListener mobiBannerListener) {
         getHandler().postDelayed(() -> {
-            if (admobBanner == null && facebookBanner == null && unityBanner == null) {
-                throw new Error("MobiOptionsAds Exception: You have to call the load() method before setting up a listener");
-            }
             this.mobiBannerListener = mobiBannerListener;
+            this.thisBannerListener = MobiOptionsBanner.this;
             if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER) && facebookBanner != null) {
                 facebookBanner.loadAd(facebookBanner.buildLoadAdConfig().withAdListener(setUpFacebookListener()).build());
             } else if (getMobiSetting().getAdsProvider().equals(ADMOB_PROVIDER) && admobBanner != null) {
                 admobBanner.setAdListener(setUpAdmobListener());
             } else if (getMobiSetting().getAdsProvider().equals(UNITY_PROVIDER) && unityBanner != null) {
                 unityBanner.setListener(setUpUnityListener());
-            } else if (getMobiSetting().getAdsProvider().equals(ROTATION_PROVIDER)) {
-
-            /*
-                    TODO => handle here the rotation things, check which one should provide the ads and don't forgot
-                        to set the provider name in the getMobiSetting() object because it's used in the callbacks.
-            */
-
             }
         }, 300);
     }
@@ -78,12 +106,13 @@ public class MobiOptionsBanner extends BaseAd {
     // region public functions
 
     public void load() {
-        getHandler().post(() -> {
+        getHandler().postDelayed(() -> {
             if (getMobiSetting().getAdsEnabled() != SETTINGS_ADS_ENABLED) {
                 Log.d(TAG, "Load ad failed, The ads are disabled from your settings, try to enable them \n" +
                         "Ads Enabled state => " + getMobiSetting().getAdsEnabled());
                 return;
             }
+            Map<String, Object> data = new HashMap<>();
             switch (getMobiSetting().getAdsProvider()) {
                 case FACEBOOK_PROVIDER:
                     if (size.getFacebookBannerSize() == null) {
@@ -93,6 +122,8 @@ public class MobiOptionsBanner extends BaseAd {
                     facebookBanner = new AdView(bannerContainer.getContext(), getBannerId(), size.getFacebookBannerSize().getAdSize());
                     facebookBanner.loadAd();
                     bannerContainer.addView(facebookBanner);
+                    data.put("fb", true);
+                    MobiOptionsAdsInit.setAppStats(data);
                     break;
                 case ADMOB_PROVIDER:
                     if (size.getAdmobBannerSize() == null) {
@@ -104,20 +135,24 @@ public class MobiOptionsBanner extends BaseAd {
                     admobBanner.setAdSize(size.getAdmobBannerSize().getAdSize());
                     admobBanner.loadAd(new AdRequest.Builder().build());
                     bannerContainer.addView(admobBanner);
+                    data.put("ab", true);
+                    MobiOptionsAdsInit.setAppStats(data);
                     break;
                 case UNITY_PROVIDER:
                     if (size.getUnityBannerSize() == null) {
                         Log.d(TAG, "The size of the banner should not be null");
                         return;
                     }
-                    UnityAds.initialize(bannerContainer.getContext(), getUnityGameId(), true);
+                    UnityAds.initialize(bannerContainer.getContext(), getUnityGameId(), isTesting());
                     unityBanner = new BannerView((AppCompatActivity) bannerContainer.getContext(), getBannerId(),
                             size.getUnityBannerSize().getUnityBannerSize());
                     unityBanner.load();
                     bannerContainer.addView(unityBanner);
+                    data.put("ub", true);
+                    MobiOptionsAdsInit.setAppStats(data);
                     break;
             }
-        });
+        }, 500);
     }
 
 
@@ -147,6 +182,7 @@ public class MobiOptionsBanner extends BaseAd {
             public void onError(Ad ad, AdError adError) {
                 MobiOptionBannerError error = new MobiOptionBannerError(String.valueOf(adError.getErrorCode()), adError.getErrorMessage());
                 mobiBannerListener.onFailedToLoad(getMobiSetting().getAdsProvider(), error);
+                thisBannerListener.onFailedToLoad(getMobiSetting().getAdsProvider(), error);
             }
 
             @Override
@@ -178,6 +214,7 @@ public class MobiOptionsBanner extends BaseAd {
             public void onAdFailedToLoad(LoadAdError loadAdError) {
                 MobiOptionBannerError error = new MobiOptionBannerError(String.valueOf(loadAdError.getCode()), loadAdError.getMessage());
                 mobiBannerListener.onFailedToLoad(getMobiSetting().getAdsProvider(), error);
+                thisBannerListener.onFailedToLoad(getMobiSetting().getAdsProvider(), error);
             }
 
             @Override
@@ -224,6 +261,7 @@ public class MobiOptionsBanner extends BaseAd {
             public void onBannerFailedToLoad(BannerView bannerView, BannerErrorInfo bannerErrorInfo) {
                 MobiOptionBannerError errors = new MobiOptionBannerError(bannerErrorInfo.errorCode.toString(), bannerErrorInfo.errorMessage);
                 mobiBannerListener.onFailedToLoad(getMobiSetting().getAdsProvider(), errors);
+                thisBannerListener.onFailedToLoad(getMobiSetting().getAdsProvider(), errors);
             }
 
             @Override
@@ -232,4 +270,89 @@ public class MobiOptionsBanner extends BaseAd {
             }
         };
     }
+
+    // region ------------
+
+    @Override
+    public void onLoaded(String adsProvider) {
+        // NO-OP
+    }
+
+    @Override
+    public void onClicked(String adsProvider) {
+        // NO-OP
+    }
+
+    @Override
+    public void onFailedToLoad(String adsProvider, MobiOptionBannerError error) {
+        if (isDefaultProvider && adsProvider.equals(ADMOB_PROVIDER) && !admobFailed) {
+            admobFailed = true;
+            Log.d(MobiConstants.TAG, "admob failed, trying to load facebook ad..");
+            getMobiSetting().setAdsProvider(FACEBOOK_PROVIDER);
+            reloadAd();
+        } else if (isDefaultProvider && adsProvider.equals(UNITY_PROVIDER) && !unityFailed) {
+            unityFailed = true;
+            Log.d(MobiConstants.TAG, "All ads failed to load");
+        } else if (isDefaultProvider && adsProvider.equals(FACEBOOK_PROVIDER) && !facebookFailed) {
+            facebookFailed = true;
+            Log.d(MobiConstants.TAG, "facebook failed, trying to load unity ad..");
+            getMobiSetting().setAdsProvider(UNITY_PROVIDER);
+            reloadAd();
+        }
+    }
+
+    @Override
+    public void onLeftApplication(String adsProvider) {
+        // NO-OP
+    }
+
+    private void reloadAd() {
+        getHandler().post(() -> {
+            Map<String, Object> data = new HashMap<>();
+            switch (getMobiSetting().getAdsProvider()) {
+                case FACEBOOK_PROVIDER:
+                    if (size.getFacebookBannerSize() == null) {
+                        Log.d(TAG, "The size of the banner should not be null");
+                        return;
+                    }
+                    setBannerId(advertisement.getFacebookId());
+                    facebookBanner = new AdView(bannerContainer.getContext(), getBannerId(), size.getFacebookBannerSize().getAdSize());
+                    facebookBanner.loadAd();
+                    bannerContainer.addView(facebookBanner);
+                    data.put("fb", true);
+                    MobiOptionsAdsInit.setAppStats(data);
+                    break;
+                case ADMOB_PROVIDER:
+                    if (size.getAdmobBannerSize() == null) {
+                        Log.d(TAG, "The size of the banner should not be null");
+                        return;
+                    }
+                    setBannerId(advertisement.getAdmobId());
+                    admobBanner = new com.google.android.gms.ads.AdView(bannerContainer.getContext());
+                    admobBanner.setAdUnitId(getBannerId());
+                    admobBanner.setAdSize(size.getAdmobBannerSize().getAdSize());
+                    admobBanner.loadAd(new AdRequest.Builder().build());
+                    bannerContainer.addView(admobBanner);
+                    data.put("ab", true);
+                    MobiOptionsAdsInit.setAppStats(data);
+                    break;
+                case UNITY_PROVIDER:
+                    if (size.getUnityBannerSize() == null) {
+                        Log.d(TAG, "The size of the banner should not be null");
+                        return;
+                    }
+                    setBannerId(advertisement.getUnityId());
+                    UnityAds.initialize(bannerContainer.getContext(), getUnityGameId(), isTesting());
+                    unityBanner = new BannerView((AppCompatActivity) bannerContainer.getContext(), getBannerId(),
+                            size.getUnityBannerSize().getUnityBannerSize());
+                    unityBanner.load();
+                    bannerContainer.addView(unityBanner);
+                    data.put("ub", true);
+                    MobiOptionsAdsInit.setAppStats(data);
+                    break;
+            }
+        });
+    }
+
+    // endregion
 }

@@ -29,7 +29,6 @@ android {
 }
 
 dependencies {
-
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'org.jetbrains:annotations:16.0.1'
@@ -38,12 +37,14 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     implementation 'com.facebook.android:audience-network-sdk:6.1.0'
-    implementation 'com.google.android.gms:play-services-ads:19.4.0'
+    implementation 'com.google.android.gms:play-services-ads:19.5.0'
 
     implementation 'com.google.code.gson:gson:2.8.6'
 
     implementation project(":unity-ads")
+    implementation project(':nativetemplates')
 
-//    debugImplementation files('libs/unity-ads.aar')
-//    releaseImplementation files('libs/unity-ads.aar')
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.7.2'
 }

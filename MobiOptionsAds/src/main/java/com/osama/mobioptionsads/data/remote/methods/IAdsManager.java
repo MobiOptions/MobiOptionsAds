@@ -1,6 +1,6 @@
-package com.osama.mobioptionsads.data.methods;
+package com.osama.mobioptionsads.data.remote.methods;
 
-import com.osama.mobioptionsads.data.model.ApiResponse;
+import com.osama.mobioptionsads.data.remote.model.ApiResponse;
 
 import java.util.Map;
 

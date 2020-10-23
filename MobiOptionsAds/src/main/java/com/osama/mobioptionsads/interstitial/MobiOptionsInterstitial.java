@@ -1,8 +1,6 @@
 package com.osama.mobioptionsads.interstitial;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,42 +12,75 @@ import com.facebook.ads.InterstitialAdListener;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
+import com.osama.mobioptionsads.MobiConstants;
+import com.osama.mobioptionsads.MobiOptionsAdsInit;
 import com.osama.mobioptionsads.base.BaseAd;
-import com.osama.mobioptionsads.data.model.MobiSetting;
+import com.osama.mobioptionsads.data.remote.model.Advertisement;
 import com.unity3d.ads.IUnityAdsListener;
 import com.unity3d.ads.UnityAds;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import static com.osama.mobioptionsads.MobiConstants.*;
 import static com.osama.mobioptionsads.MobiConstants.ADMOB_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.FACEBOOK_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.UNITY_PROVIDER;
 
-public class MobiOptionsInterstitial extends BaseAd {
+public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialListener {
 
     private MobiInterstitialListener mobiInterstitialListener;
+    private MobiInterstitialListener thisMobiInterstitialListener;
 
     private InterstitialAd facebookInterstitial;
     private com.google.android.gms.ads.InterstitialAd admobInterstitial;
 
-    private final Handler handler = new Handler(Looper.getMainLooper());
-
     private final Context context;
+
+    private boolean isDefaultProvider = false;
+
+    private boolean admobFailed = false;
+    private boolean facebookFailed = false;
+    private boolean unityFailed = false;
+
+    private Advertisement advertisement;
 
     @Override
     protected void setupMobiSettings(@NotNull String adName) {
-        getMobiSetting().setAdsProvider(UNITY_PROVIDER);
-        getMobiSetting().setAdsEnabled(1);
+        getHandler().post(() -> {
+            for (Advertisement ad : getMobiSetting().getAds()) {
+                if (ad.getName().equals(adName)) {
+                    this.advertisement = ad;
+                    switch (getMobiSetting().getAdsProvider()) {
+                        case FACEBOOK_PROVIDER:
+                            setInterstitialAdId(ad.getFacebookId());
+                            break;
+                        case ADMOB_PROVIDER:
+                            setInterstitialAdId(ad.getAdmobId());
+                            break;
+                        case UNITY_PROVIDER:
+                            setInterstitialAdId(ad.getUnityId());
+                            break;
+                        case DEFAULT_PROVIDER:
+                            getMobiSetting().setAdsProvider(ADMOB_PROVIDER);
+                            setInterstitialAdId(ad.getAdmobId());
+                            isDefaultProvider = true;
+                            break;
+                    }
+                    break;
+                }
+            }
+        });
     }
 
-    public void setMobiInterstitialListener(MobiInterstitialListener mobiInterstitialListener) {
-        handler.postDelayed(() -> {
-            if (facebookInterstitial == null && admobInterstitial == null && !getMobiSetting().getAdsProvider().equals(UNITY_PROVIDER)) {
-                throw new Error("MobiOptions Exception: You should call the load method before setting up the listener");
-            }
+    public void setMobiInterstitialListener(@NotNull MobiInterstitialListener mobiInterstitialListener) {
+        getHandler().postDelayed(() -> {
             this.mobiInterstitialListener = mobiInterstitialListener;
+            this.thisMobiInterstitialListener = MobiOptionsInterstitial.this;
             if (getMobiSetting().getAdsProvider().equals(UNITY_PROVIDER)) {
                 UnityAds.addListener(this.getUnityListener());
             } else if (getMobiSetting().getAdsProvider().equals(ADMOB_PROVIDER) && admobInterstitial != null) {
@@ -77,7 +108,7 @@ public class MobiOptionsInterstitial extends BaseAd {
      * Call this method before setting up a listener for the interstitial
      */
     public void loadAd() {
-        handler.post(() -> {
+        getHandler().postDelayed(() -> {
             switch (getMobiSetting().getAdsProvider()) {
                 case FACEBOOK_PROVIDER:
                     facebookInterstitial = new InterstitialAd(context, getInterstitialAdId());
@@ -89,10 +120,10 @@ public class MobiOptionsInterstitial extends BaseAd {
                     admobInterstitial.loadAd(new AdRequest.Builder().build());
                     break;
                 case UNITY_PROVIDER:
-                    UnityAds.initialize(context, getUnityGameId(), true);                                 // TODO => change the test mode here
+                    UnityAds.initialize(context, getUnityGameId(), isTesting());
                     break;
             }
-        });
+        }, 500);
     }
 
 
@@ -101,22 +132,29 @@ public class MobiOptionsInterstitial extends BaseAd {
      * check that using the MobiInterstitialListener.
      */
     public void show() {
-        handler.post(() -> {
+        getHandler().post(() -> {
+            Map<String, Object> data = new HashMap<>();
             if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER) && facebookInterstitial != null) {
                 if (facebookInterstitial.isAdLoaded()) {
                     facebookInterstitial.show();
+                    data.put("fi", true);
+                    MobiOptionsAdsInit.setAppStats(data);
                 } else {
                     Log.d(TAG, "Failed to show Facebook interstitial, not yet loaded");
                 }
             } else if (getMobiSetting().getAdsProvider().equals(UNITY_PROVIDER)) {
                 if (UnityAds.isReady(getInterstitialAdId())) {
                     UnityAds.show((AppCompatActivity) context, getInterstitialAdId());
+                    data.put("ui", true);
+                    MobiOptionsAdsInit.setAppStats(data);
                 } else {
                     Log.d(TAG, "Failed to show UnityAds interstitial, not yet loaded");
                 }
             } else if (getMobiSetting().getAdsProvider().equals(ADMOB_PROVIDER) && admobInterstitial != null) {
                 if (admobInterstitial.isLoaded()) {
                     admobInterstitial.show();
+                    data.put("ai", true);
+                    MobiOptionsAdsInit.setAppStats(data);
                 } else {
                     Log.d(TAG, "Failed to show Admob interstitial, not yet loaded");
                 }
@@ -163,6 +201,8 @@ public class MobiOptionsInterstitial extends BaseAd {
             public void onUnityAdsError(UnityAds.UnityAdsError unityAdsError, String s) {
                 mobiInterstitialListener.onError(getMobiSetting().getAdsProvider(),
                         new MobiInterstitialError(unityAdsError.name(), "Message: ".concat(unityAdsError.name())));
+                thisMobiInterstitialListener.onError(getMobiSetting().getAdsProvider(),
+                        new MobiInterstitialError(unityAdsError.name(), "Message: ".concat(unityAdsError.name())));
             }
         };
     }
@@ -180,6 +220,7 @@ public class MobiOptionsInterstitial extends BaseAd {
             public void onAdFailedToLoad(LoadAdError loadAdError) {
                 MobiInterstitialError error = new MobiInterstitialError(String.valueOf(loadAdError.getCode()), loadAdError.getMessage());
                 mobiInterstitialListener.onError(getMobiSetting().getAdsProvider(), error);
+                thisMobiInterstitialListener.onError(getMobiSetting().getAdsProvider(), error);
             }
 
             @Override
@@ -227,6 +268,7 @@ public class MobiOptionsInterstitial extends BaseAd {
             public void onError(Ad ad, AdError adError) {
                 MobiInterstitialError error = new MobiInterstitialError(String.valueOf(adError.getErrorCode()), adError.getErrorMessage());
                 mobiInterstitialListener.onError(getMobiSetting().getAdsProvider(), error);
+                thisMobiInterstitialListener.onError(getMobiSetting().getAdsProvider(), error);
             }
 
             @Override
@@ -245,4 +287,68 @@ public class MobiOptionsInterstitial extends BaseAd {
             }
         };
     }
+
+    // region -----
+
+    @Override
+    public void onDisplayed(String adsProvider) {
+        // NO-OP
+    }
+
+    @Override
+    public void onClosed(String adsProvider) {
+        // NO-OP
+    }
+
+    @Override
+    public void onError(String adsProvider, MobiInterstitialError error) {
+        if (isDefaultProvider && adsProvider.equals(ADMOB_PROVIDER) && !admobFailed) {
+            admobFailed = true;
+            Log.d(MobiConstants.TAG, "admob failed, trying to load facebook ad..");
+            getMobiSetting().setAdsProvider(FACEBOOK_PROVIDER);
+            reloadAd();
+        } else if (isDefaultProvider && adsProvider.equals(UNITY_PROVIDER) && !unityFailed) {
+            unityFailed = true;
+            Log.d(MobiConstants.TAG, "All ads failed to load");
+        } else if (isDefaultProvider && adsProvider.equals(FACEBOOK_PROVIDER) && !facebookFailed) {
+            facebookFailed = true;
+            Log.d(MobiConstants.TAG, "facebook failed, trying to load unity ad..");
+            getMobiSetting().setAdsProvider(UNITY_PROVIDER);
+            reloadAd();
+        }
+    }
+
+    @Override
+    public void onLoaded(String adsProvider) {
+        // NO-OP
+    }
+
+    @Override
+    public void onClicked(String adsProvider) {
+        // NO-OP
+    }
+
+    private void reloadAd() {
+        getHandler().post(() -> {
+            switch (getMobiSetting().getAdsProvider()) {
+                case FACEBOOK_PROVIDER:
+                    setInterstitialAdId(advertisement.getFacebookId());
+                    facebookInterstitial = new InterstitialAd(context, getInterstitialAdId());
+                    facebookInterstitial.loadAd();
+                    break;
+                case ADMOB_PROVIDER:
+                    setInterstitialAdId(advertisement.getAdmobId());
+                    admobInterstitial = new com.google.android.gms.ads.InterstitialAd(context);
+                    admobInterstitial.setAdUnitId(getInterstitialAdId());
+                    admobInterstitial.loadAd(new AdRequest.Builder().build());
+                    break;
+                case UNITY_PROVIDER:
+                    setInterstitialAdId(advertisement.getUnityId());
+                    UnityAds.initialize(context, getUnityGameId(), isTesting());
+                    break;
+            }
+        });
+    }
+
+    // endregion
 }

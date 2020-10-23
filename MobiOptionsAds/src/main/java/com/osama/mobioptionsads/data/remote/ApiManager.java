@@ -1,12 +1,9 @@
-package com.osama.mobioptionsads.data;
-
-import android.content.Context;
+package com.osama.mobioptionsads.data.remote;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.osama.mobioptionsads.data.methods.IAdsManager;
-import com.osama.mobioptionsads.data.model.ApiResponse;
-import com.osama.mobioptionsads.data.utils.ItemTypeAdapterFactory;
+import com.osama.mobioptionsads.data.remote.methods.IAdsManager;
+import com.osama.mobioptionsads.data.remote.model.ApiResponse;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -69,6 +66,6 @@ public class ApiManager implements IApiManager {
 
     @Override
     public Call<ApiResponse> setAdsStats(Map<String, Object> fields) {
-        return null;
+        return adsManager.setAdsStats(fields);
     }
 }

@@ -1,4 +1,4 @@
-package com.osama.mobioptionsads.data.utils;
+package com.osama.mobioptionsads.data.remote.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

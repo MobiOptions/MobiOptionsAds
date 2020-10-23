@@ -1,9 +1,7 @@
-package com.osama.mobioptionsads.data;
+package com.osama.mobioptionsads.data.remote;
 
-import com.osama.mobioptionsads.data.methods.IAdsManager;
+import com.osama.mobioptionsads.data.remote.methods.IAdsManager;
 
 public interface IApiManager extends IAdsManager {
-
-    // ------
-
+    // NO-OP
 }

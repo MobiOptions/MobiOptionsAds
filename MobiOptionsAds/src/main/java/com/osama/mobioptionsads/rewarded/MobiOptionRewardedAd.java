@@ -17,31 +17,69 @@ import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdCallback;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.osama.mobioptionsads.MobiConstants;
+import com.osama.mobioptionsads.MobiOptionsAdsInit;
 import com.osama.mobioptionsads.base.BaseAd;
+import com.osama.mobioptionsads.data.remote.model.Advertisement;
 import com.unity3d.ads.IUnityAdsListener;
 import com.unity3d.ads.UnityAds;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import static com.osama.mobioptionsads.MobiConstants.ADMOB_PROVIDER;
+import static com.osama.mobioptionsads.MobiConstants.DEFAULT_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.FACEBOOK_PROVIDER;
+import static com.osama.mobioptionsads.MobiConstants.ROTATION_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.UNITY_PROVIDER;
 
-public class MobiOptionRewardedAd extends BaseAd {
+public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadListener {
 
-    private Context context;
+    private final Context context;
 
     private RewardedAd admobRewardedAd;
     private RewardedVideoAd facebookRewardedVideoAd;
 
     private MobiRewardAdLoadListener loadListener;
     private MobiRewardAdListener rewardAdListener;
+    private MobiRewardAdLoadListener thisLoadListener;
+
+    private boolean admobFailed = false;
+    private boolean facebookFailed = false;
+    private boolean unityFailed = false;
+    private boolean isDefaultProvider = false;
+
+    private Advertisement advertisement;
 
     @Override
     protected void setupMobiSettings(@NotNull String adName) {
-        getMobiSetting().setAdsEnabled(1);
-        getMobiSetting().setAdsProvider(UNITY_PROVIDER);
+        getHandler().post(() -> {
+            for (Advertisement ad : getMobiSetting().getAds()) {
+                if (ad.getName().equals(adName)) {
+                    this.advertisement = ad;
+                    switch (getMobiSetting().getAdsProvider()) {
+                        case FACEBOOK_PROVIDER:
+                            setRewardedAdId(ad.getFacebookId());
+                            break;
+                        case ADMOB_PROVIDER:
+                            setRewardedAdId(ad.getAdmobId());
+                            break;
+                        case UNITY_PROVIDER:
+                            setRewardedAdId(ad.getUnityId());
+                            break;
+                        case DEFAULT_PROVIDER:
+                            getMobiSetting().setAdsProvider(ADMOB_PROVIDER);
+                            isDefaultProvider = true;
+                            setRewardedAdId(ad.getAdmobId());
+                            break;
+                    }
+                    break;
+                }
+            }
+        });
     }
 
     public MobiOptionRewardedAd(@NotNull Context context, @NotNull String adName) {
@@ -56,39 +94,52 @@ public class MobiOptionRewardedAd extends BaseAd {
     // region public functions
 
     public void load(@NonNull MobiRewardAdLoadListener rewardAdLoadListener) {
-        this.loadListener = rewardAdLoadListener;
-        switch (getMobiSetting().getAdsProvider()) {
-            case ADMOB_PROVIDER:
-                admobRewardedAd = new RewardedAd(context, getRewardedAdId());
-                admobRewardedAd.loadAd(new AdRequest.Builder().build(), getAdmobLoadListener());
-                break;
-            case UNITY_PROVIDER:
-                UnityAds.initialize(context, getUnityGameId(), true);                                 // TODO => change the test mode here
-
-                UnityAds.addListener(getUnityListener());
-                break;
-            case FACEBOOK_PROVIDER:
-                facebookRewardedVideoAd = new RewardedVideoAd(context, getRewardedAdId());
-                facebookRewardedVideoAd.buildLoadAdConfig().withAdListener(getFacebookListener()).build();
-                facebookRewardedVideoAd.loadAd();
-                break;
-        }
+        getHandler().postDelayed(() -> {
+            this.loadListener = rewardAdLoadListener;
+            this.thisLoadListener = MobiOptionRewardedAd.this;
+            switch (getMobiSetting().getAdsProvider()) {
+                case ADMOB_PROVIDER:
+                    admobRewardedAd = new RewardedAd(context, getRewardedAdId());
+                    admobRewardedAd.loadAd(new AdRequest.Builder().build(), getAdmobLoadListener());
+                    break;
+                case UNITY_PROVIDER:
+                    UnityAds.initialize(context, getUnityGameId(), isTesting());
+                    UnityAds.addListener(getUnityListener());
+                    break;
+                case FACEBOOK_PROVIDER:
+                    facebookRewardedVideoAd = new RewardedVideoAd(context, getRewardedAdId());
+                    facebookRewardedVideoAd.buildLoadAdConfig().withAdListener(getFacebookListener()).build();
+                    facebookRewardedVideoAd.loadAd();
+                    break;
+            }
+        }, 500);
     }
 
 
     public void show(@NotNull MobiRewardAdListener rewardAdListener) {
-        this.rewardAdListener = rewardAdListener;
-        if (getMobiSetting().getAdsProvider().equals(ADMOB_PROVIDER) && admobRewardedAd != null) {
-            admobRewardedAd.show((AppCompatActivity) context, getAdmobRewardListener());
-        } else if (getMobiSetting().getAdsProvider().equals(UNITY_PROVIDER)) {
-            if (UnityAds.isReady(getRewardedAdId())) {               // this is just a double check
-                UnityAds.show((AppCompatActivity) context, getRewardedAdId());
+        getHandler().post(() -> {
+            this.rewardAdListener = rewardAdListener;
+            Map<String, Object> data = new HashMap<>();
+            if (getMobiSetting().getAdsProvider().equals(ADMOB_PROVIDER) && admobRewardedAd != null) {
+                if (admobRewardedAd.isLoaded()) {
+                    admobRewardedAd.show((AppCompatActivity) context, getAdmobRewardListener());
+                    data.put("ar", true);
+                    MobiOptionsAdsInit.setAppStats(data);
+                }
+            } else if (getMobiSetting().getAdsProvider().equals(UNITY_PROVIDER)) {
+                if (UnityAds.isReady(getRewardedAdId())) {
+                    UnityAds.show((AppCompatActivity) context, getRewardedAdId());
+                    data.put("ur", true);
+                    MobiOptionsAdsInit.setAppStats(data);
+                }
+            } else if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER)) {
+                if (facebookRewardedVideoAd.isAdLoaded()) {
+                    facebookRewardedVideoAd.show();
+                    data.put("fr", true);
+                    MobiOptionsAdsInit.setAppStats(data);
+                }
             }
-        } else if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER)) {
-            if (facebookRewardedVideoAd.isAdLoaded()) {
-                facebookRewardedVideoAd.show();
-            }
-        }
+        });
     }
 
     public boolean isLoaded() {
@@ -120,6 +171,7 @@ public class MobiOptionRewardedAd extends BaseAd {
                 super.onRewardedAdFailedToLoad(loadAdError);
                 MobiRewardAdError error = new MobiRewardAdError(loadAdError.getCode(), loadAdError.getMessage());
                 loadListener.onRewardedAdFailedToLoad(getMobiSetting().getAdsProvider(), error);
+                thisLoadListener.onRewardedAdFailedToLoad(getMobiSetting().getAdsProvider(), error);
             }
         };
     }
@@ -163,13 +215,16 @@ public class MobiOptionRewardedAd extends BaseAd {
 
             @Override
             public void onUnityAdsStart(String s) {
+                if (rewardAdListener == null)
+                    return;
                 rewardAdListener.onRewardedAdOpened(getMobiSetting().getAdsProvider());
             }
 
             @Override
             public void onUnityAdsFinish(String s, UnityAds.FinishState finishState) {
                 if (finishState.equals(UnityAds.FinishState.COMPLETED)) {
-                    rewardAdListener.onUserEarnedReward(getMobiSetting().getAdsProvider());
+                    if (rewardAdListener != null)
+                        rewardAdListener.onUserEarnedReward(getMobiSetting().getAdsProvider());
                 } else if (finishState.equals(UnityAds.FinishState.SKIPPED)) {
                     rewardAdListener.onRewardedAdClosed(getMobiSetting().getAdsProvider());
                 } else if (finishState.equals(UnityAds.FinishState.ERROR)) {
@@ -181,6 +236,7 @@ public class MobiOptionRewardedAd extends BaseAd {
             @Override
             public void onUnityAdsError(UnityAds.UnityAdsError unityAdsError, String s) {
                 rewardAdListener.onRewardedAdError(getMobiSetting().getAdsProvider(), new MobiRewardAdError(-1, unityAdsError.name()));
+                thisLoadListener.onRewardedAdFailedToLoad(getMobiSetting().getAdsProvider(), new MobiRewardAdError(-1, unityAdsError.name()));
             }
         };
     }
@@ -206,8 +262,13 @@ public class MobiOptionRewardedAd extends BaseAd {
 
             @Override
             public void onError(Ad ad, com.facebook.ads.AdError adError) {
-                rewardAdListener.onRewardedAdError(getMobiSetting().getAdsProvider(), new MobiRewardAdError(adError.getErrorCode(), adError.getErrorMessage()));
                 loadListener.onRewardedAdFailedToLoad(getMobiSetting().getAdsProvider(), new MobiRewardAdError(adError.getErrorCode(), adError.getErrorMessage()));
+
+                if (rewardAdListener != null)
+                    rewardAdListener.onRewardedAdError(getMobiSetting().getAdsProvider(), new MobiRewardAdError(adError.getErrorCode(), adError.getErrorMessage()));
+
+                if (thisLoadListener != null)
+                    thisLoadListener.onRewardedAdFailedToLoad(getMobiSetting().getAdsProvider(), new MobiRewardAdError(adError.getErrorCode(), adError.getErrorMessage()));
             }
 
             @Override
@@ -221,5 +282,54 @@ public class MobiOptionRewardedAd extends BaseAd {
             }
         };
     }
+
+
+    // region -----
+
+    @Override
+    public void onRewardedAdLoaded(String adsProvider) {
+        Log.d(MobiConstants.TAG, "onRewardedAdLoaded: Ad loaded successfully");
+    }
+
+    @Override
+    public void onRewardedAdFailedToLoad(@NotNull String adsProvider, MobiRewardAdError error) {
+        if (isDefaultProvider && adsProvider.equals(ADMOB_PROVIDER) && !admobFailed) {
+            admobFailed = true;
+            Log.d(MobiConstants.TAG, "admob failed, trying to load facebook ad..");
+            getMobiSetting().setAdsProvider(FACEBOOK_PROVIDER);
+            reloadAd();
+        } else if (isDefaultProvider && adsProvider.equals(UNITY_PROVIDER) && !unityFailed) {
+            unityFailed = true;
+            Log.d(MobiConstants.TAG, "All ads failed to load");
+        } else if (isDefaultProvider && adsProvider.equals(FACEBOOK_PROVIDER) && !facebookFailed) {
+            facebookFailed = true;
+            Log.d(MobiConstants.TAG, "facebook failed, trying to load unity ad..");
+            getMobiSetting().setAdsProvider(UNITY_PROVIDER);
+            reloadAd();
+        }
+    }
+
+    private void reloadAd() {
+        switch (getMobiSetting().getAdsProvider()) {
+            case ADMOB_PROVIDER:
+                setRewardedAdId(advertisement.getAdmobId());
+                admobRewardedAd = new RewardedAd(context, getRewardedAdId());
+                admobRewardedAd.loadAd(new AdRequest.Builder().build(), getAdmobLoadListener());
+                break;
+            case UNITY_PROVIDER:
+                setRewardedAdId(advertisement.getUnityId());
+                UnityAds.initialize(context, getUnityGameId(), isTesting());
+                UnityAds.addListener(getUnityListener());
+                break;
+            case FACEBOOK_PROVIDER:
+                setRewardedAdId(advertisement.getFacebookId());
+                facebookRewardedVideoAd = new RewardedVideoAd(context, getRewardedAdId());
+                facebookRewardedVideoAd.buildLoadAdConfig().withAdListener(getFacebookListener()).build();
+                facebookRewardedVideoAd.loadAd();
+                break;
+        }
+    }
+
+    // endregion
 
 }

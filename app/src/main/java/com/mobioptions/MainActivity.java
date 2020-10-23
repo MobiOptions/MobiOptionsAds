@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.RootApplication;
+import com.osama.mobioptionsads.MobiInitializationListener;
 import com.osama.mobioptionsads.banner.MobiBannerListener;
 import com.osama.mobioptionsads.banner.MobiOptionBannerError;
 import com.osama.mobioptionsads.banner.MobiOptionsBanner;
@@ -19,6 +20,12 @@ import com.osama.mobioptionsads.banner.size.UnityBannerSize;
 import com.osama.mobioptionsads.interstitial.MobiInterstitialError;
 import com.osama.mobioptionsads.interstitial.MobiInterstitialListener;
 import com.osama.mobioptionsads.interstitial.MobiOptionsInterstitial;
+import com.osama.mobioptionsads.nativeAd.MobiNativeAdError;
+import com.osama.mobioptionsads.nativeAd.MobiNativeAdListener;
+import com.osama.mobioptionsads.nativeAd.MobiNativeAdSize;
+import com.osama.mobioptionsads.nativeAd.MobiOptionsNativeAd;
+import com.osama.mobioptionsads.nativeAd.size.NativeAdFacebookSize;
+import com.osama.mobioptionsads.nativeAd.size.NativeAdmobSize;
 import com.osama.mobioptionsads.rewarded.MobiOptionRewardedAd;
 import com.osama.mobioptionsads.rewarded.MobiRewardAdError;
 import com.osama.mobioptionsads.rewarded.MobiRewardAdListener;
@@ -33,6 +40,11 @@ public class MainActivity extends AppCompatActivity {
     private MobiOptionsBanner banner;
     private MobiOptionsInterstitial interstitial;
     private MobiOptionRewardedAd rewardedAd;
+
+    private MobiOptionsNativeAd nativeAd;
+
+    private LinearLayout nativeAdContainer;
+
 
     private final MobiRewardAdListener rewardAdListener = new
             MobiRewardAdListener() {
@@ -68,11 +80,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RootApplication.setupMobiOptionsAds(null);
 
+        // You can call this method one time and listen to the initialization
+        // response.
+        RootApplication.setupMobiOptionsAds(new MobiInitializationListener() {
+            @Override
+            public void onInitializationSuccess() {
+                // your setup is done the ads will be displayed
+                setUpAllAds();
+            }
+
+            @Override
+            public void onInitializationFailed(String error) {
+                // log the errors
+                Log.d(TAG, "onInitializationFailed: " + error);
+            }
+        });
+    }
+
+
+    private void setUpAllAds() {
         LinearLayout bannerContainer = findViewById(R.id.banner_container);
         AppCompatButton interstitialButton = findViewById(R.id.show_interstitial);
         AppCompatButton rewardedAdButton = findViewById(R.id.show_rewarded_ad);
+
+        nativeAdContainer = findViewById(R.id.native_ad_container);
 
         MobiOptionsBannerSize bannerSize = new MobiOptionsBannerSize(
                 new AdmobBannerSize(AdmobBannerSize.ADMOB_SMART_BANNER),
@@ -81,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         // setup banner
-        banner = new MobiOptionsBanner(bannerContainer, bannerSize, "the_name_of_a_banner_from_your_settings");
+        banner = new MobiOptionsBanner(bannerContainer, bannerSize, "Banner_testing");
         banner.load();
 
 
@@ -130,12 +162,15 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Ad not loaded yet", Toast.LENGTH_SHORT).show();
             }
         });
+
+
+        // Native ads
+        setUpNativeAd();
     }
 
 
     private void setUpInterstitial() {
-        // setup interstitial
-        interstitial = new MobiOptionsInterstitial(this, "interstitial_name");
+        interstitial = new MobiOptionsInterstitial(this, "Interstitial_testing");
         interstitial.loadAd();
         interstitial.setMobiInterstitialListener(new MobiInterstitialListener() {
             @Override
@@ -169,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setUpRewardedAd() {
-        rewardedAd = new MobiOptionRewardedAd(this, "Rewarded_ad_name");
+        rewardedAd = new MobiOptionRewardedAd(this, "Rewarded_testing");
         rewardedAd.load(new MobiRewardAdLoadListener() {
             @Override
             public void onRewardedAdLoaded(String adsProvider) {
@@ -178,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
 //                if (rewardedAd.isLoaded()) {
 //                    rewardedAd.show(rewardAdListener);
 //                }
-
                 Log.d(TAG, "onRewardedAdLoaded: rewarded ad was loaded successfully");
             }
 
@@ -190,9 +224,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void setUpNativeAd() {
+        MobiNativeAdSize size = new MobiNativeAdSize(NativeAdmobSize.GNT_SMALL_TEMPLATE,
+                NativeAdFacebookSize.WIDTH_280_HEIGHT_250);
+        nativeAd = new MobiOptionsNativeAd(this, "Native_testing", size, nativeAdContainer);
+        nativeAd.load(new MobiNativeAdListener() {
+            @Override
+            public void onAdLoaded(String adsProvider) {
+                // here you can call the show method to show the native ad
+                Log.d(TAG, "onAdLoaded: The native ad is loaded => " + adsProvider);
+                nativeAd.show();
+            }
+
+            @Override
+            public void onAdError(String adsProvider, MobiNativeAdError error) {
+                Log.d(TAG, "onAdError: " + adsProvider + ", errors: " + error.code + ", message: " + error.message);
+            }
+
+            @Override
+            public void onAdClicked(String adsProvider) {
+                Log.d(TAG, "onAdClicked: " + adsProvider + " native ad was clicked.");
+            }
+        });
+    }
+
+
     @Override
     protected void onDestroy() {
-        banner.destroy();
+        if (banner != null) {
+            banner.destroy();
+        }
+        if (nativeAd != null) {
+            nativeAd.destroy();
+        }
         super.onDestroy();
     }
 }
