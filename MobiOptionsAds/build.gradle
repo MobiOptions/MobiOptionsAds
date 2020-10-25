@@ -41,7 +41,9 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.6'
 
-    implementation project(":unity-ads")
+//    implementation project(":unity-ads")
+    releaseImplementation files('libs/unity-ads.aar')
+    debugImplementation files('libs/unity-ads.aar')
     implementation project(':nativetemplates')
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

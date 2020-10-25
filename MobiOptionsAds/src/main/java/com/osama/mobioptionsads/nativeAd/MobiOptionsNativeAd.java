@@ -37,6 +37,8 @@ import java.util.Map;
 import static com.osama.mobioptionsads.MobiConstants.ADMOB_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.DEFAULT_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.FACEBOOK_PROVIDER;
+import static com.osama.mobioptionsads.MobiConstants.SETTINGS_ADS_ENABLED;
+import static com.osama.mobioptionsads.MobiConstants.TAG;
 import static com.osama.mobioptionsads.MobiConstants.UNITY_PROVIDER;
 
 public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener {
@@ -101,6 +103,11 @@ public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener 
 
     public void load(@NotNull MobiNativeAdListener mobiNativeAdListener) {
         getHandler().postDelayed(() -> {
+            if (getMobiSetting().getAdsEnabled() != SETTINGS_ADS_ENABLED) {
+                Log.d(TAG, "Load ad failed, The ads are disabled from your settings\n" +
+                        "Ads Enabled state => " + getMobiSetting().getAdsEnabled());
+                return;
+            }
             this.mobiNativeAdListener = mobiNativeAdListener;
             this.thisMobiNativeAdListener = MobiOptionsNativeAd.this;
             switch (getMobiSetting().getAdsProvider()) {
@@ -140,7 +147,7 @@ public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener 
                     templateView.setNativeAd(unifiedNativeAd);
                 data.put("an", true);
                 MobiOptionsAdsInit.setAppStats(data);
-            } else if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER)) {
+            } else if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER) && facebookNativeAd != null) {
                 if (facebookNativeAd.isAdLoaded()) {
                     View adView = NativeAdView.render(context, facebookNativeAd);
                     adContainer.addView(adView);

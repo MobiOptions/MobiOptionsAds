@@ -45,7 +45,23 @@ public class MobiSetting {
 
     @Expose
     @SerializedName("serve_perc")
-    private Long serveAdPer;
+    private Double serveAdPer;
+
+
+    private boolean isSingle = false;
+
+
+    public boolean isSingle() {
+        return isSingle;
+    }
+
+    public void setSingle(boolean single) {
+        isSingle = single;
+    }
+
+    @Expose
+    @SerializedName("unity_game_id")
+    String unityGameId;
 
 
     @Expose
@@ -90,13 +106,13 @@ public class MobiSetting {
 
 
     @SerializedName("serve_perc")
-    public Long getServeAdPer() {
+    public Double getServeAdPer() {
         return serveAdPer;
     }
 
 
     @SerializedName("serve_perc")
-    public void setServeAdPer(Long serveAdPer) {
+    public void setServeAdPer(Double serveAdPer) {
         this.serveAdPer = serveAdPer;
     }
 
@@ -158,5 +174,17 @@ public class MobiSetting {
     @SerializedName("auto_disable")
     public void setAutoDisable(int autoDisable) {
         this.autoDisable = autoDisable;
+    }
+
+
+    @SerializedName("unity_game_id")
+    public String getUnityGameId() {
+        return unityGameId;
+    }
+
+
+    @SerializedName("unity_game_id")
+    public void setUnityGameId(String unityGameId) {
+        this.unityGameId = unityGameId;
     }
 }

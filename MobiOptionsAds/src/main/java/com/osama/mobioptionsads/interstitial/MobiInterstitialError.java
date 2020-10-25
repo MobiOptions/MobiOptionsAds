@@ -1,5 +1,7 @@
 package com.osama.mobioptionsads.interstitial;
 
+import org.jetbrains.annotations.NotNull;
+
 public class MobiInterstitialError {
 
     public String code;
@@ -11,7 +13,7 @@ public class MobiInterstitialError {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return "MobiInterstitialError details: code: " + code + "\nmessage: " + message;
     }
 }

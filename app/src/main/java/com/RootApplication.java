@@ -18,7 +18,7 @@ public class RootApplication extends Application {
 
     public static synchronized void setupMobiOptionsAds(@NotNull MobiInitializationListener listener) {
         if (mobiOptionsAdsInit == null) {
-            mobiOptionsAdsInit = new MobiOptionsAdsInit(rootApplication, "5QkzBKobuLjiypdKXg1f5LGMyC0xh6", listener);
+            mobiOptionsAdsInit = new MobiOptionsAdsInit(rootApplication, "TJ6N6Wy8aZsc9oWW92TuXlIZwsGtj7", listener);
         }
     }
 

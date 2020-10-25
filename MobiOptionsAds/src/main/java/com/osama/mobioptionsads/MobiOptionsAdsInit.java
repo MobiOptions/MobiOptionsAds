@@ -62,9 +62,9 @@ public class MobiOptionsAdsInit {
                         mobiInitializationListener.onInitializationFailed("MobiOptionsAds: Initialization error: Invalid token");
                     } else if (apiResponse.getMobiSetting() != null) {
 
-//                        mobiSetting = apiResponse.getMobiSetting();
+                        mobiSetting = apiResponse.getMobiSetting();
 
-                        mobiSetting = getFakeMobiSettings();
+//                        mobiSetting = getFakeMobiSettings();
 
                         dataManger.setAppToken(apiResponse.getMobiSetting().getToken());
                         if (dataManger.getLaunchedFirstTime())
@@ -77,6 +77,8 @@ public class MobiOptionsAdsInit {
 
                         if (mobiSetting.getAdsProvider().equals(ROTATION_PROVIDER))
                             setUpRotationProviders();
+                        else
+                            setUpSingleProviders();
 
                         Log.d(MobiConstants.TAG, "onResponse: => all data is here");
                     }
@@ -175,6 +177,11 @@ public class MobiOptionsAdsInit {
             mobiSetting.setAdsProvider(UNITY_PROVIDER);
             MobiOptionsAdsInit.setShownProviders(map);
         }
+    }
+
+
+    private void setUpSingleProviders() {
+        mobiSetting.setSingle(true);
     }
 
 

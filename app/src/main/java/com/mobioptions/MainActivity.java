@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         // setup banner
-        banner = new MobiOptionsBanner(bannerContainer, bannerSize, "Banner_testing");
+        banner = new MobiOptionsBanner(bannerContainer, bannerSize, "Banner_0");
         banner.load();
 
 
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setUpInterstitial() {
-        interstitial = new MobiOptionsInterstitial(this, "Interstitial_testing");
+        interstitial = new MobiOptionsInterstitial(this, "Interstitial_2");
         interstitial.loadAd();
         interstitial.setMobiInterstitialListener(new MobiInterstitialListener() {
             @Override
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setUpRewardedAd() {
-        rewardedAd = new MobiOptionRewardedAd(this, "Rewarded_testing");
+        rewardedAd = new MobiOptionRewardedAd(this, "Rewarded Video_3");
         rewardedAd.load(new MobiRewardAdLoadListener() {
             @Override
             public void onRewardedAdLoaded(String adsProvider) {
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
     private void setUpNativeAd() {
         MobiNativeAdSize size = new MobiNativeAdSize(NativeAdmobSize.GNT_SMALL_TEMPLATE,
                 NativeAdFacebookSize.WIDTH_280_HEIGHT_250);
-        nativeAd = new MobiOptionsNativeAd(this, "Native_testing", size, nativeAdContainer);
+        nativeAd = new MobiOptionsNativeAd(this, "Native_4", size, nativeAdContainer);
         nativeAd.load(new MobiNativeAdListener() {
             @Override
             public void onAdLoaded(String adsProvider) {

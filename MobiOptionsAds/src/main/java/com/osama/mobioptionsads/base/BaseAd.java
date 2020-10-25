@@ -40,7 +40,8 @@ public abstract class BaseAd {
 
 
     // unity game id required for the unity interstitial, rewarded ad, and unity banner
-    private String unityGameId = "3871085";
+    // unity game id => 3871085
+    private String unityGameId = MobiOptionsAdsInit.mobiSetting.getUnityGameId();
 
 
     public void setMobiSetting(MobiSetting mobiSetting) {

@@ -108,7 +108,7 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
     public void load() {
         getHandler().postDelayed(() -> {
             if (getMobiSetting().getAdsEnabled() != SETTINGS_ADS_ENABLED) {
-                Log.d(TAG, "Load ad failed, The ads are disabled from your settings, try to enable them \n" +
+                Log.d(TAG, "Load ad failed, The ads are disabled from your settings\n" +
                         "Ads Enabled state => " + getMobiSetting().getAdsEnabled());
                 return;
             }

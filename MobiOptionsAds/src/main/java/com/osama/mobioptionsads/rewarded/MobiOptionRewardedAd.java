@@ -34,6 +34,8 @@ import static com.osama.mobioptionsads.MobiConstants.ADMOB_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.DEFAULT_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.FACEBOOK_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.ROTATION_PROVIDER;
+import static com.osama.mobioptionsads.MobiConstants.SETTINGS_ADS_ENABLED;
+import static com.osama.mobioptionsads.MobiConstants.TAG;
 import static com.osama.mobioptionsads.MobiConstants.UNITY_PROVIDER;
 
 public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadListener {
@@ -95,6 +97,11 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
 
     public void load(@NonNull MobiRewardAdLoadListener rewardAdLoadListener) {
         getHandler().postDelayed(() -> {
+            if (getMobiSetting().getAdsEnabled() != SETTINGS_ADS_ENABLED) {
+                Log.d(TAG, "Load ad failed, The ads are disabled from your settings\n" +
+                        "Ads Enabled state => " + getMobiSetting().getAdsEnabled());
+                return;
+            }
             this.loadListener = rewardAdLoadListener;
             this.thisLoadListener = MobiOptionRewardedAd.this;
             switch (getMobiSetting().getAdsProvider()) {

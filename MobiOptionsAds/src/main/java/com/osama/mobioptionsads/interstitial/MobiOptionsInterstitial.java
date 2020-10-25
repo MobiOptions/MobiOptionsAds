@@ -109,6 +109,11 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
      */
     public void loadAd() {
         getHandler().postDelayed(() -> {
+            if (getMobiSetting().getAdsEnabled() != SETTINGS_ADS_ENABLED) {
+                Log.d(TAG, "Load ad failed, The ads are disabled from your settings\n" +
+                        "Ads Enabled state => " + getMobiSetting().getAdsEnabled());
+                return;
+            }
             switch (getMobiSetting().getAdsProvider()) {
                 case FACEBOOK_PROVIDER:
                     facebookInterstitial = new InterstitialAd(context, getInterstitialAdId());
