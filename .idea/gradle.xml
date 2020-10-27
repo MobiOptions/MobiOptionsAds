@@ -14,8 +14,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/MobiOptionsAds" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/nativetemplates" />
-            <option value="$PROJECT_DIR$/unity-ads" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
