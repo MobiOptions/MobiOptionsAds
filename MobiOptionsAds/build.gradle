@@ -44,7 +44,7 @@ dependencies {
 //    implementation project(":unity-ads")
     implementation project(':nativetemplates')
 
-    implementation files('libs/unity-ads.aar')
+    compileOnly files('libs/unity-ads.aar')
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
