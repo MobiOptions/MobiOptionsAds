@@ -84,6 +84,10 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
 
     public void setMobiBannerListener(MobiBannerListener mobiBannerListener) {
         getHandler().postDelayed(() -> {
+            if (facebookBanner == null && admobBanner == null && unityBanner == null) {
+                Log.d(TAG, "setMobiBannerListener: Call the load method before setting up a listener");
+                return;
+            }
             this.mobiBannerListener = mobiBannerListener;
             this.thisBannerListener = MobiOptionsBanner.this;
             if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER) && facebookBanner != null) {
@@ -93,7 +97,7 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
             } else if (getMobiSetting().getAdsProvider().equals(UNITY_PROVIDER) && unityBanner != null) {
                 unityBanner.setListener(setUpUnityListener());
             }
-        }, 300);
+        }, 500);
     }
 
 
@@ -106,7 +110,7 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
     // region public functions
 
     public void load() {
-        getHandler().postDelayed(() -> {
+        getHandler().post(() -> {
             if (getMobiSetting().getAdsEnabled() != SETTINGS_ADS_ENABLED) {
                 Log.d(TAG, "Load ad failed, The ads are disabled from your settings\n" +
                         "Ads Enabled state => " + getMobiSetting().getAdsEnabled());
@@ -152,7 +156,7 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
                     MobiOptionsAdsInit.setAppStats(data);
                     break;
             }
-        }, 500);
+        });
     }
 
 
