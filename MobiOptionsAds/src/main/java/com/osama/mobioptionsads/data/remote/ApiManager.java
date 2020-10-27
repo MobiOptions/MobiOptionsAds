@@ -24,13 +24,10 @@ public class ApiManager implements IApiManager {
     private final IAdsManager adsManager;
 
     public ApiManager() {
-        HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
-        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(50, TimeUnit.SECONDS)
                 .writeTimeout(50, TimeUnit.SECONDS)
                 .readTimeout(50, TimeUnit.SECONDS)
-                .addInterceptor(httpLoggingInterceptor)
                 .addInterceptor(chain -> {
                     Request request = chain.request()
                             .newBuilder()
