@@ -25,7 +25,7 @@ public class LocalData implements ILocalData {
 
     private final SharedPreferences sharedPreferences;
 
-    public LocalData(@NotNull Context context) {
+    public LocalData(Context context) {
         sharedPreferences = context.getSharedPreferences(SHARED_PRES_NAME, Context.MODE_PRIVATE);
     }
 
@@ -71,7 +71,7 @@ public class LocalData implements ILocalData {
     }
 
     @Override
-    public void setLastProvidersShown(@NotNull Map<String, Boolean> map) {
+    public void setLastProvidersShown(Map<String, Boolean> map) {
         sharedPreferences.edit().putBoolean(FACEBOOK_PROVIDER_KEY, Objects.requireNonNull(map.get(MobiConstants.FACEBOOK_PROVIDER))).apply();
         sharedPreferences.edit().putBoolean(ADMOB_PROVIDER_KEY, Objects.requireNonNull(map.get(MobiConstants.ADMOB_PROVIDER))).apply();
         sharedPreferences.edit().putBoolean(UNITY_PROVIDER_KEY, Objects.requireNonNull(map.get(MobiConstants.UNITY_PROVIDER))).apply();

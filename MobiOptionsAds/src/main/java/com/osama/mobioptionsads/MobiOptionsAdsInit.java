@@ -47,15 +47,15 @@ public class MobiOptionsAdsInit {
     private static DataManger dataManger;
     public static MobiSetting mobiSetting;
 
-    public MobiOptionsAdsInit(@NotNull Context context,
-                              @NotNull String applicationToken,
-                              @NotNull MobiInitializationListener mobiInitializationListener) {
+    public MobiOptionsAdsInit(Context context,
+                              String applicationToken,
+                              MobiInitializationListener mobiInitializationListener) {
         this.mobiInitializationListener = mobiInitializationListener;
         setUpDataManager(context);
         Call<ApiResponse> verifyCall = dataManger.verifyAppToken(applicationToken);
         verifyCall.enqueue(new Callback<ApiResponse>() {
             @Override
-            public void onResponse(@NotNull Call<ApiResponse> call, @NotNull Response<ApiResponse> response) {
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 ApiResponse apiResponse = response.body();
                 if (apiResponse != null) {
                     if (apiResponse.getCode() == 404 && !apiResponse.getStatus()) {
@@ -86,7 +86,7 @@ public class MobiOptionsAdsInit {
             }
 
             @Override
-            public void onFailure(@NotNull Call<ApiResponse> call, @NotNull Throwable t) {
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
                 mobiInitializationListener.onInitializationFailed("MobiOptionsAds: Initialization error: " + t.getMessage());
             }
         });
@@ -103,13 +103,12 @@ public class MobiOptionsAdsInit {
     }
 
 
-    @Contract(value = " -> new", pure = true)
-    private @NotNull OnInitializationCompleteListener getAdmobInitListener() {
+    private OnInitializationCompleteListener getAdmobInitListener() {
         return initializationStatus -> mobiInitializationListener.onInitializationSuccess();
     }
 
 
-    private void setupSDKs(@NotNull Context context) {
+    private void setupSDKs(Context context) {
         handler.post(() -> {
             // facebook initialization
             if (BuildConfig.DEBUG) {
@@ -130,13 +129,13 @@ public class MobiOptionsAdsInit {
             Call<ApiResponse> apiResponseCall = dataManger.setAppLaunchedFirstTime(fields);
             apiResponseCall.enqueue(new Callback<ApiResponse>() {
                 @Override
-                public void onResponse(@NotNull Call<ApiResponse> call, @NotNull Response<ApiResponse> response) {
+                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
 //                    dataManger.setLaunchedFirstTime(false);                                                               // TODO : uncomment this...
                     Log.d(MobiConstants.TAG, "onResponse: => check the response");
                 }
 
                 @Override
-                public void onFailure(@NotNull Call<ApiResponse> call, @NotNull Throwable t) {
+                public void onFailure(Call<ApiResponse> call, Throwable t) {
                     Log.d(MobiConstants.TAG, "onFailure: setAppLaunchedFirstTime errors => " + t.getMessage());
                 }
             });
@@ -199,19 +198,19 @@ public class MobiOptionsAdsInit {
             Call<ApiResponse> apiResponseCall = dataManger.setAppInitialized(fields);
             apiResponseCall.enqueue(new Callback<ApiResponse>() {
                 @Override
-                public void onResponse(@NotNull Call<ApiResponse> call, @NotNull Response<ApiResponse> response) {
+                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                     Log.d(MobiConstants.TAG, "onResponse: setAppLaunched success");
                 }
 
                 @Override
-                public void onFailure(@NotNull Call<ApiResponse> call, @NotNull Throwable t) {
+                public void onFailure(Call<ApiResponse> call, Throwable t) {
                     Log.d(MobiConstants.TAG, "onFailure: setAppLaunched errors " + t.getMessage());
                 }
             });
         });
     }
 
-    private boolean isInstalledFromPlayStore(@NotNull Context context) {
+    private boolean isInstalledFromPlayStore(Context context) {
         List<String> providers = new ArrayList<>(Arrays.asList("com.android.vending", "com.google.android.feedback"));
         final String installer = context.getPackageManager().getInstallerPackageName(context.getPackageName());
         return installer != null && providers.contains(installer);
@@ -231,30 +230,30 @@ public class MobiOptionsAdsInit {
         return false;
     }
 
-    public static void setAppStats(@NotNull Map<String, Object> fields) {
+    public static void setAppStats(Map<String, Object> fields) {
         Handler handlerOne = new Handler(Looper.getMainLooper());
         handlerOne.post(() -> {
             fields.put("ads_projects_id", dataManger.getAppToken());
             Call<ApiResponse> apiResponseCall = dataManger.setAdsStats(fields);
             apiResponseCall.enqueue(new Callback<ApiResponse>() {
                 @Override
-                public void onResponse(@NotNull Call<ApiResponse> call, @NotNull Response<ApiResponse> response) {
+                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                     Log.d(MobiConstants.TAG, "onResponse: setAppStats => success");
                 }
 
                 @Override
-                public void onFailure(@NotNull Call<ApiResponse> call, @NotNull Throwable t) {
+                public void onFailure(Call<ApiResponse> call, Throwable t) {
                     Log.d(MobiConstants.TAG, "onFailure: setAppStats => " + t.getMessage());
                 }
             });
         });
     }
 
-    public static void setShownProviders(@NotNull Map<String, Boolean> shownProviders) {
+    public static void setShownProviders(Map<String, Boolean> shownProviders) {
         dataManger.setLastProvidersShown(shownProviders);
     }
 
-    private @NotNull MobiSetting getFakeMobiSettings() {
+    private MobiSetting getFakeMobiSettings() {
         MobiSetting mobiSetting = new MobiSetting();
         mobiSetting.setAdsProvider(ROTATION_PROVIDER);
         mobiSetting.setAdsEnabled(MobiConstants.SETTINGS_ADS_ENABLED);

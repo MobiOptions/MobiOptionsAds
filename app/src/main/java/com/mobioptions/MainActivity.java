@@ -31,7 +31,6 @@ import com.osama.mobioptionsads.rewarded.MobiRewardAdError;
 import com.osama.mobioptionsads.rewarded.MobiRewardAdListener;
 import com.osama.mobioptionsads.rewarded.MobiRewardAdLoadListener;
 
-import org.jetbrains.annotations.NotNull;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onRewardedAdError(String adProvider, @NotNull MobiRewardAdError error) {
+                public void onRewardedAdError(String adProvider, MobiRewardAdError error) {
                     // Log the errors
                     Log.d(TAG, "onRewardedAdError: Reward Error, (provider: " + adProvider + ")." + "\n" + error.toString());
                 }

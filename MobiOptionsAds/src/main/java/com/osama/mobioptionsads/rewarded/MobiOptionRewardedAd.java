@@ -23,17 +23,13 @@ import com.osama.mobioptionsads.data.remote.model.Advertisement;
 import com.unity3d.ads.IUnityAdsListener;
 import com.unity3d.ads.UnityAds;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.osama.mobioptionsads.MobiConstants.ADMOB_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.DEFAULT_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.FACEBOOK_PROVIDER;
-import static com.osama.mobioptionsads.MobiConstants.ROTATION_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.SETTINGS_ADS_ENABLED;
 import static com.osama.mobioptionsads.MobiConstants.TAG;
 import static com.osama.mobioptionsads.MobiConstants.UNITY_PROVIDER;
@@ -57,7 +53,7 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
     private Advertisement advertisement;
 
     @Override
-    protected void setupMobiSettings(@NotNull String adName) {
+    protected void setupMobiSettings(String adName) {
         getHandler().post(() -> {
             for (Advertisement ad : getMobiSetting().getAds()) {
                 if (ad.getName().equals(adName)) {
@@ -84,7 +80,7 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
         });
     }
 
-    public MobiOptionRewardedAd(@NotNull Context context, @NotNull String adName) {
+    public MobiOptionRewardedAd(Context context, String adName) {
         if (!(context instanceof AppCompatActivity)) {
             throw new Error("MobiOptionsException: The context should be an instance of AppCompatActivity");
         }
@@ -95,7 +91,7 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
 
     // region public functions
 
-    public void load(@NonNull MobiRewardAdLoadListener rewardAdLoadListener) {
+    public void load(MobiRewardAdLoadListener rewardAdLoadListener) {
         getHandler().postDelayed(() -> {
             if (getMobiSetting().getAdsEnabled() != SETTINGS_ADS_ENABLED) {
                 Log.d(TAG, "Load ad failed, The ads are disabled from your settings\n" +
@@ -123,7 +119,7 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
     }
 
 
-    public void show(@NotNull MobiRewardAdListener rewardAdListener) {
+    public void show(MobiRewardAdListener rewardAdListener) {
         getHandler().post(() -> {
             this.rewardAdListener = rewardAdListener;
             Map<String, Object> data = new HashMap<>();
@@ -164,8 +160,7 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
     // endregion
 
 
-    @Contract(value = " -> new", pure = true)
-    private @NotNull RewardedAdLoadCallback getAdmobLoadListener() {
+    private RewardedAdLoadCallback getAdmobLoadListener() {
         return new RewardedAdLoadCallback() {
             @Override
             public void onRewardedAdLoaded() {
@@ -184,7 +179,7 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
     }
 
 
-    private @NotNull RewardedAdCallback getAdmobRewardListener() {
+    private RewardedAdCallback getAdmobRewardListener() {
         return new RewardedAdCallback() {
             @Override
             public void onRewardedAdOpened() {
@@ -213,7 +208,7 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
     }
 
 
-    private @NotNull IUnityAdsListener getUnityListener() {
+    private IUnityAdsListener getUnityListener() {
         return new IUnityAdsListener() {
             @Override
             public void onUnityAdsReady(String s) {
@@ -249,8 +244,7 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
     }
 
 
-    @Contract(value = " -> new", pure = true)
-    private @NotNull RewardedVideoAdListener getFacebookListener() {
+    private RewardedVideoAdListener getFacebookListener() {
         return new RewardedVideoAdListener() {
             @Override
             public void onRewardedVideoCompleted() {
@@ -299,7 +293,7 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
     }
 
     @Override
-    public void onRewardedAdFailedToLoad(@NotNull String adsProvider, MobiRewardAdError error) {
+    public void onRewardedAdFailedToLoad(String adsProvider, MobiRewardAdError error) {
         if (isDefaultProvider && adsProvider.equals(ADMOB_PROVIDER) && !admobFailed) {
             admobFailed = true;
             Log.d(MobiConstants.TAG, "admob failed, trying to load facebook ad..");

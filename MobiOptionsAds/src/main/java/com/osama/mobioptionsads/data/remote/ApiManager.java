@@ -50,7 +50,7 @@ public class ApiManager implements IApiManager {
     }
 
     @Override
-    public Call<ApiResponse> verifyAppToken(@NotNull String appToken) {
+    public Call<ApiResponse> verifyAppToken(String appToken) {
         return adsManager.verifyAppToken(appToken);
     }
 

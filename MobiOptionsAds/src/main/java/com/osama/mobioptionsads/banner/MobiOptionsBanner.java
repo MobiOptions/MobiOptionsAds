@@ -55,7 +55,7 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
     private Advertisement advertisement;
 
     @Override
-    protected void setupMobiSettings(@NotNull String adName) {
+    protected void setupMobiSettings(String adName) {
         getHandler().post(() -> {
             for (Advertisement ad : getMobiSetting().getAds()) {
                 if (ad.getName().equals(adName)) {
@@ -97,7 +97,7 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
     }
 
 
-    public MobiOptionsBanner(@NotNull LinearLayout container, @NotNull MobiOptionsBannerSize size, String adName) {
+    public MobiOptionsBanner(@NotNull LinearLayout container, MobiOptionsBannerSize size, String adName) {
         this.size = size;
         this.bannerContainer = container;
         this.setupMobiSettings(adName);
@@ -175,8 +175,8 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
 
     // endregion
 
-    @Contract(pure = true)
-    private @NotNull AdListener setUpFacebookListener() {
+
+    private AdListener setUpFacebookListener() {
         return new AdListener() {
             @Override
             public void onError(Ad ad, AdError adError) {
@@ -202,8 +202,8 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
         };
     }
 
-    @Contract(value = " -> new", pure = true)
-    private com.google.android.gms.ads.@NotNull AdListener setUpAdmobListener() {
+
+    private com.google.android.gms.ads.AdListener setUpAdmobListener() {
         return new com.google.android.gms.ads.AdListener() {
             @Override
             public void onAdClosed() {
@@ -244,8 +244,8 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
         };
     }
 
-    @Contract(value = " -> new", pure = true)
-    private BannerView.@NotNull IListener setUpUnityListener() {
+
+    private BannerView.IListener setUpUnityListener() {
         return new BannerView.IListener() {
             @Override
             public void onBannerLoaded(BannerView bannerView) {

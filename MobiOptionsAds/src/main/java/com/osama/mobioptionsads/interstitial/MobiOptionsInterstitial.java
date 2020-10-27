@@ -19,12 +19,8 @@ import com.osama.mobioptionsads.data.remote.model.Advertisement;
 import com.unity3d.ads.IUnityAdsListener;
 import com.unity3d.ads.UnityAds;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.osama.mobioptionsads.MobiConstants.*;
 import static com.osama.mobioptionsads.MobiConstants.ADMOB_PROVIDER;
@@ -50,7 +46,7 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
     private Advertisement advertisement;
 
     @Override
-    protected void setupMobiSettings(@NotNull String adName) {
+    protected void setupMobiSettings(String adName) {
         getHandler().post(() -> {
             for (Advertisement ad : getMobiSetting().getAds()) {
                 if (ad.getName().equals(adName)) {
@@ -77,7 +73,7 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
         });
     }
 
-    public void setMobiInterstitialListener(@NotNull MobiInterstitialListener mobiInterstitialListener) {
+    public void setMobiInterstitialListener(MobiInterstitialListener mobiInterstitialListener) {
         getHandler().postDelayed(() -> {
             this.mobiInterstitialListener = mobiInterstitialListener;
             this.thisMobiInterstitialListener = MobiOptionsInterstitial.this;
@@ -93,7 +89,7 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
         }, 200);
     }
 
-    public MobiOptionsInterstitial(@NotNull Context context, @NotNull String adName) {
+    public MobiOptionsInterstitial(Context context, String adName) {
         if (!(context instanceof AppCompatActivity)) {
             throw new Error("MobiOptions Error: The context should be an instance of an Activity");
         }
@@ -183,8 +179,7 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
     // endregion
 
 
-    @Contract(value = " -> new", pure = true)
-    private @NotNull IUnityAdsListener getUnityListener() {
+    private IUnityAdsListener getUnityListener() {
         return new IUnityAdsListener() {
 
             @Override
@@ -213,8 +208,7 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
     }
 
 
-    @Contract(value = " -> new", pure = true)
-    private @NotNull AdListener getAdmobListener() {
+    private AdListener getAdmobListener() {
         return new AdListener() {
             @Override
             public void onAdClosed() {
@@ -256,8 +250,7 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
     }
 
 
-    @Contract(value = " -> new", pure = true)
-    private @NotNull InterstitialAdListener getFacebookListener() {
+    private InterstitialAdListener getFacebookListener() {
         return new InterstitialAdListener() {
             @Override
             public void onInterstitialDisplayed(Ad ad) {

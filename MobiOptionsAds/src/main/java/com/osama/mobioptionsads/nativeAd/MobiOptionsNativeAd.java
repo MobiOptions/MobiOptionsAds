@@ -28,9 +28,6 @@ import com.osama.mobioptionsads.base.BaseAd;
 import com.osama.mobioptionsads.data.remote.model.Advertisement;
 import com.osama.mobioptionsads.nativeAd.size.NativeAdmobSize;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +36,6 @@ import static com.osama.mobioptionsads.MobiConstants.DEFAULT_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.FACEBOOK_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.SETTINGS_ADS_ENABLED;
 import static com.osama.mobioptionsads.MobiConstants.TAG;
-import static com.osama.mobioptionsads.MobiConstants.UNITY_PROVIDER;
 
 public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener {
 
@@ -63,7 +59,7 @@ public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener 
 
 
     @Override
-    protected void setupMobiSettings(@NotNull String adName) {
+    protected void setupMobiSettings(String adName) {
         getHandler().post(() -> {
             for (Advertisement ad : getMobiSetting().getAds()) {
                 if (ad.getName().equals(adName)) {
@@ -87,10 +83,10 @@ public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener 
         });
     }
 
-    public MobiOptionsNativeAd(@NotNull Context context,
-                               @NotNull String adName,
-                               @NotNull MobiNativeAdSize mobiNativeAdSize,
-                               @NotNull ViewGroup adContainer) {
+    public MobiOptionsNativeAd(Context context,
+                               String adName,
+                               MobiNativeAdSize mobiNativeAdSize,
+                               ViewGroup adContainer) {
         if (!(context instanceof AppCompatActivity)) {
             throw new Error("MobiOptionsException: The context should be an instance of AppCompatActivity");
         }
@@ -101,7 +97,7 @@ public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener 
     }
 
 
-    public void load(@NotNull MobiNativeAdListener mobiNativeAdListener) {
+    public void load(MobiNativeAdListener mobiNativeAdListener) {
         getHandler().postDelayed(() -> {
             if (getMobiSetting().getAdsEnabled() != SETTINGS_ADS_ENABLED) {
                 Log.d(TAG, "Load ad failed, The ads are disabled from your settings\n" +
@@ -167,8 +163,8 @@ public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener 
     }
 
 
-    @Contract(value = " -> new", pure = true)
-    private @NotNull NativeAdListener getFacebookListener() {
+
+    private NativeAdListener getFacebookListener() {
         return new NativeAdListener() {
             @Override
             public void onMediaDownloaded(Ad ad) {
@@ -205,8 +201,8 @@ public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener 
         };
     }
 
-    @Contract(value = " -> new", pure = true)
-    private @NotNull AdListener getAdmobListener() {
+
+    private  AdListener getAdmobListener() {
         return new AdListener() {
             @Override
             public void onAdClosed() {

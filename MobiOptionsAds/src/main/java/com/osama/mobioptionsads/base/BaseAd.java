@@ -96,7 +96,7 @@ public abstract class BaseAd {
         return mobiSetting;
     }
 
-    protected abstract void setupMobiSettings(@NotNull String adName);
+    protected abstract void setupMobiSettings(String adName);
 
     protected void destroy() {
         this.handler.removeCallbacks(null);

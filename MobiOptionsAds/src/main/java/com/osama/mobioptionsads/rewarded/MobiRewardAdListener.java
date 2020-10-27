@@ -1,7 +1,5 @@
 package com.osama.mobioptionsads.rewarded;
 
-import org.jetbrains.annotations.NotNull;
-
 public interface MobiRewardAdListener {
 
     void onRewardedAdOpened(String adsProvider);
@@ -10,6 +8,6 @@ public interface MobiRewardAdListener {
 
     void onUserEarnedReward(String adProvider);
 
-    void onRewardedAdError(String adProvider,@NotNull MobiRewardAdError error);
+    void onRewardedAdError(String adProvider, MobiRewardAdError error);
 
 }
