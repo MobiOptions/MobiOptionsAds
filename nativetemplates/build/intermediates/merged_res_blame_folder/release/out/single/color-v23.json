@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "C:\\Users\\Oussama\\Desktop\\Apps_Code_Clients\\MobiOptions\\nativetemplates\\build\\intermediates\\res\\merged\\release\\color-v23\\abc_color_highlight_material.xml",
+        "source": "C:\\Users\\Oussama\\.gradle\\caches\\transforms-2\\files-2.1\\8d24a5ddd7e610a898c38fce8d24d4f1\\appcompat-1.2.0\\res\\color-v23\\abc_color_highlight_material.xml"
+    },
+    {
+        "merged": "C:\\Users\\Oussama\\Desktop\\Apps_Code_Clients\\MobiOptions\\nativetemplates\\build\\intermediates\\res\\merged\\release\\color-v23\\abc_tint_switch_track.xml",
+        "source": "C:\\Users\\Oussama\\.gradle\\caches\\transforms-2\\files-2.1\\8d24a5ddd7e610a898c38fce8d24d4f1\\appcompat-1.2.0\\res\\color-v23\\abc_tint_switch_track.xml"
+    },
+    {
+        "merged": "C:\\Users\\Oussama\\Desktop\\Apps_Code_Clients\\MobiOptions\\nativetemplates\\build\\intermediates\\res\\merged\\release\\color-v23\\abc_tint_default.xml",
+        "source": "C:\\Users\\Oussama\\.gradle\\caches\\transforms-2\\files-2.1\\8d24a5ddd7e610a898c38fce8d24d4f1\\appcompat-1.2.0\\res\\color-v23\\abc_tint_default.xml"
+    },
+    {
+        "merged": "C:\\Users\\Oussama\\Desktop\\Apps_Code_Clients\\MobiOptions\\nativetemplates\\build\\intermediates\\res\\merged\\release\\color-v23\\abc_tint_spinner.xml",
+        "source": "C:\\Users\\Oussama\\.gradle\\caches\\transforms-2\\files-2.1\\8d24a5ddd7e610a898c38fce8d24d4f1\\appcompat-1.2.0\\res\\color-v23\\abc_tint_spinner.xml"
+    },
+    {
+        "merged": "C:\\Users\\Oussama\\Desktop\\Apps_Code_Clients\\MobiOptions\\nativetemplates\\build\\intermediates\\res\\merged\\release\\color-v23\\abc_btn_colored_borderless_text_material.xml",
+        "source": "C:\\Users\\Oussama\\.gradle\\caches\\transforms-2\\files-2.1\\8d24a5ddd7e610a898c38fce8d24d4f1\\appcompat-1.2.0\\res\\color-v23\\abc_btn_colored_borderless_text_material.xml"
+    },
+    {
+        "merged": "C:\\Users\\Oussama\\Desktop\\Apps_Code_Clients\\MobiOptions\\nativetemplates\\build\\intermediates\\res\\merged\\release\\color-v23\\abc_btn_colored_text_material.xml",
+        "source": "C:\\Users\\Oussama\\.gradle\\caches\\transforms-2\\files-2.1\\8d24a5ddd7e610a898c38fce8d24d4f1\\appcompat-1.2.0\\res\\color-v23\\abc_btn_colored_text_material.xml"
+    },
+    {
+        "merged": "C:\\Users\\Oussama\\Desktop\\Apps_Code_Clients\\MobiOptions\\nativetemplates\\build\\intermediates\\res\\merged\\release\\color-v23\\abc_tint_edittext.xml",
+        "source": "C:\\Users\\Oussama\\.gradle\\caches\\transforms-2\\files-2.1\\8d24a5ddd7e610a898c38fce8d24d4f1\\appcompat-1.2.0\\res\\color-v23\\abc_tint_edittext.xml"
+    },
+    {
+        "merged": "C:\\Users\\Oussama\\Desktop\\Apps_Code_Clients\\MobiOptions\\nativetemplates\\build\\intermediates\\res\\merged\\release\\color-v23\\abc_tint_btn_checkable.xml",
+        "source": "C:\\Users\\Oussama\\.gradle\\caches\\transforms-2\\files-2.1\\8d24a5ddd7e610a898c38fce8d24d4f1\\appcompat-1.2.0\\res\\color-v23\\abc_tint_btn_checkable.xml"
+    },
+    {
+        "merged": "C:\\Users\\Oussama\\Desktop\\Apps_Code_Clients\\MobiOptions\\nativetemplates\\build\\intermediates\\res\\merged\\release\\color-v23\\abc_tint_seek_thumb.xml",
+        "source": "C:\\Users\\Oussama\\.gradle\\caches\\transforms-2\\files-2.1\\8d24a5ddd7e610a898c38fce8d24d4f1\\appcompat-1.2.0\\res\\color-v23\\abc_tint_seek_thumb.xml"
+    }
+]

@@ -40,4 +40,6 @@ dependencies {
 //    implementation 'org.jetbrains:annotations:16.0.1'
 
     implementation project(':MobiOptionsAds')
+    implementation files('libs/unity-ads.aar')
+    implementation files('libs/nativetemplates.aar')
 }
