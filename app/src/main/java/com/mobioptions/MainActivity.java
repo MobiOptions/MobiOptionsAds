@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         banner.load();
 
 
-        // banner call backs
+        // banner call backs, always call the load() method before setting a listener
         banner.setMobiBannerListener(new MobiBannerListener() {
             @Override
             public void onLoaded(String adsProvider) {
