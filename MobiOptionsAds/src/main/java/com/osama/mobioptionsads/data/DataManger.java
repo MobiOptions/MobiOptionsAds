@@ -6,8 +6,6 @@ import com.osama.mobioptionsads.data.local.LocalData;
 import com.osama.mobioptionsads.data.remote.ApiManager;
 import com.osama.mobioptionsads.data.remote.model.ApiResponse;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
 
 import retrofit2.Call;
@@ -17,7 +15,7 @@ public class DataManger implements IDataManager {
     private final ApiManager apiManager;
     private final LocalData localData;
 
-    public DataManger(@NotNull Context context) {
+    public DataManger(Context context) {
         apiManager = new ApiManager();
         localData = new LocalData(context);
     }

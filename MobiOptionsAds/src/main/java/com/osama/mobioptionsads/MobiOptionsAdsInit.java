@@ -5,25 +5,19 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.facebook.ads.Ad;
 import com.facebook.ads.AdSettings;
 import com.facebook.ads.AudienceNetworkAds;
 import com.facebook.ads.BuildConfig;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.osama.mobioptionsads.data.DataManger;
-import com.osama.mobioptionsads.data.remote.ApiManager;
 import com.osama.mobioptionsads.data.remote.model.Advertisement;
 import com.osama.mobioptionsads.data.remote.model.ApiResponse;
 import com.osama.mobioptionsads.data.remote.model.MobiSetting;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +29,6 @@ import retrofit2.Response;
 
 import static com.facebook.ads.AdSettings.IntegrationErrorMode.INTEGRATION_ERROR_CRASH_DEBUG_MODE;
 import static com.osama.mobioptionsads.MobiConstants.ADMOB_PROVIDER;
-import static com.osama.mobioptionsads.MobiConstants.DEFAULT_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.FACEBOOK_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.ROTATION_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.UNITY_PROVIDER;
@@ -46,10 +39,21 @@ public class MobiOptionsAdsInit {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private static DataManger dataManger;
     public static MobiSetting mobiSetting;
+    public static boolean testingMode = false;
+    private static boolean isSetUpDone = false;
+    private static List<String> admobTestDevices = new ArrayList<>();
 
-    public MobiOptionsAdsInit(Context context,
-                              String applicationToken,
-                              MobiInitializationListener mobiInitializationListener) {
+    public boolean isInitialized() {
+        return isSetUpDone;
+    }
+
+    public static void setAdmobTestDevices(List<String> admobTestDevices) {
+        MobiOptionsAdsInit.admobTestDevices = admobTestDevices;
+    }
+
+    private MobiOptionsAdsInit(Context context,
+                               String applicationToken,
+                               MobiInitializationListener mobiInitializationListener) {
         this.mobiInitializationListener = mobiInitializationListener;
         setUpDataManager(context);
         Call<ApiResponse> verifyCall = dataManger.verifyAppToken(applicationToken);
@@ -60,26 +64,19 @@ public class MobiOptionsAdsInit {
                 if (apiResponse != null) {
                     if (apiResponse.getCode() == 404 && !apiResponse.getStatus()) {
                         mobiInitializationListener.onInitializationFailed("MobiOptionsAds: Initialization error: Invalid token");
+                        isSetUpDone = false;
                     } else if (apiResponse.getMobiSetting() != null) {
-
                         mobiSetting = apiResponse.getMobiSetting();
-
-//                        mobiSetting = getFakeMobiSettings();
-
                         dataManger.setAppToken(apiResponse.getMobiSetting().getToken());
                         if (dataManger.getLaunchedFirstTime())
                             setAppLaunchedFirstTime(context);
                         setupSDKs(context);
                         setAppLaunched();
-
-//                        if (apiResponse.getMobiSetting().getAdsProvider().equals(MobiConstants.ROTATION_PROVIDER))
-//                            setUpRotationProviders();
-
                         if (mobiSetting.getAdsProvider().equals(ROTATION_PROVIDER))
-                            setUpRotationProviders();
+                            setUpRotationProviders(context);
                         else
-                            setUpSingleProviders();
-
+                            setUpSingleProviders(context);
+                        isSetUpDone = true;
                         Log.d(MobiConstants.TAG, "onResponse: => all data is here");
                     }
                 }
@@ -90,6 +87,15 @@ public class MobiOptionsAdsInit {
                 mobiInitializationListener.onInitializationFailed("MobiOptionsAds: Initialization error: " + t.getMessage());
             }
         });
+    }
+
+
+    public static synchronized MobiOptionsAdsInit build(Context context,
+                                                        String applicationToken,
+                                                        boolean isTesting,
+                                                        MobiInitializationListener mobiInitializationListener) {
+        testingMode = isTesting;
+        return new MobiOptionsAdsInit(context, applicationToken, mobiInitializationListener);
     }
 
     private static synchronized void setUpDataManager(Context context) {
@@ -110,13 +116,17 @@ public class MobiOptionsAdsInit {
 
     private void setupSDKs(Context context) {
         handler.post(() -> {
-            // facebook initialization
             if (BuildConfig.DEBUG) {
                 AdSettings.setIntegrationErrorMode(INTEGRATION_ERROR_CRASH_DEBUG_MODE);
             }
             AudienceNetworkAds.initialize(context);
-            // Admob Initialization
             MobileAds.initialize(context, getAdmobInitListener());
+            if (testingMode) {
+                RequestConfiguration requestConfiguration = new RequestConfiguration
+                        .Builder()
+                        .setTestDeviceIds(admobTestDevices).build();
+                MobileAds.setRequestConfiguration(requestConfiguration);
+            }
         });
     }
 
@@ -130,7 +140,7 @@ public class MobiOptionsAdsInit {
             apiResponseCall.enqueue(new Callback<ApiResponse>() {
                 @Override
                 public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-//                    dataManger.setLaunchedFirstTime(false);                                                               // TODO : uncomment this...
+                    dataManger.setLaunchedFirstTime(false);
                     Log.d(MobiConstants.TAG, "onResponse: => check the response");
                 }
 
@@ -142,45 +152,54 @@ public class MobiOptionsAdsInit {
         });
     }
 
-    private void setUpRotationProviders() {
-        if (!Objects.requireNonNull(dataManger.getLastProvidersShown().get(MobiConstants.FACEBOOK_PROVIDER))
-                && !Objects.requireNonNull(dataManger.getLastProvidersShown().get(MobiConstants.UNITY_PROVIDER))
-                && !Objects.requireNonNull(dataManger.getLastProvidersShown().get(MobiConstants.ADMOB_PROVIDER))) {
-            Map<String, Boolean> map = new HashMap<>();
-            map.put(MobiConstants.ADMOB_PROVIDER, false);
-            map.put(MobiConstants.FACEBOOK_PROVIDER, false);
-            map.put(MobiConstants.UNITY_PROVIDER, true);
-            dataManger.setLastProvidersShown(map);
-            mobiSetting.setAdsProvider(ADMOB_PROVIDER);
-            return;
-        }
-        if (Objects.requireNonNull(MobiOptionsAdsInit.getDataManger().getLastProvidersShown().get(UNITY_PROVIDER))) {
-            Map<String, Boolean> map = new HashMap<>();
-            map.put(ADMOB_PROVIDER, true);
-            map.put(UNITY_PROVIDER, false);
-            map.put(FACEBOOK_PROVIDER, false);
-            mobiSetting.setAdsProvider(ADMOB_PROVIDER);
-            MobiOptionsAdsInit.setShownProviders(map);
-        } else if (Objects.requireNonNull(MobiOptionsAdsInit.getDataManger().getLastProvidersShown().get(ADMOB_PROVIDER))) {
-            Map<String, Boolean> map = new HashMap<>();
-            map.put(FACEBOOK_PROVIDER, true);
-            map.put(ADMOB_PROVIDER, false);
-            map.put(UNITY_PROVIDER, false);
-            mobiSetting.setAdsProvider(FACEBOOK_PROVIDER);
-            MobiOptionsAdsInit.setShownProviders(map);
-        } else if (Objects.requireNonNull(MobiOptionsAdsInit.getDataManger().getLastProvidersShown().get(FACEBOOK_PROVIDER))) {
-            Map<String, Boolean> map = new HashMap<>();
-            map.put(FACEBOOK_PROVIDER, false);
-            map.put(ADMOB_PROVIDER, false);
-            map.put(UNITY_PROVIDER, true);
-            mobiSetting.setAdsProvider(UNITY_PROVIDER);
-            MobiOptionsAdsInit.setShownProviders(map);
+    private void setUpRotationProviders(Context context) {
+        if (isInstalledFromPlayStore(context)) {
+            if (!Objects.requireNonNull(dataManger.getLastProvidersShown().get(MobiConstants.FACEBOOK_PROVIDER))
+                    && !Objects.requireNonNull(dataManger.getLastProvidersShown().get(MobiConstants.UNITY_PROVIDER))
+                    && !Objects.requireNonNull(dataManger.getLastProvidersShown().get(MobiConstants.ADMOB_PROVIDER))) {
+                Map<String, Boolean> map = new HashMap<>();
+                map.put(MobiConstants.ADMOB_PROVIDER, false);
+                map.put(MobiConstants.FACEBOOK_PROVIDER, false);
+                map.put(MobiConstants.UNITY_PROVIDER, true);
+                dataManger.setLastProvidersShown(map);
+                mobiSetting.setAdsProvider(ADMOB_PROVIDER);
+                return;
+            }
+            if (Objects.requireNonNull(MobiOptionsAdsInit.getDataManger().getLastProvidersShown().get(UNITY_PROVIDER))) {
+                Map<String, Boolean> map = new HashMap<>();
+                map.put(ADMOB_PROVIDER, true);
+                map.put(UNITY_PROVIDER, false);
+                map.put(FACEBOOK_PROVIDER, false);
+                mobiSetting.setAdsProvider(ADMOB_PROVIDER);
+                MobiOptionsAdsInit.setShownProviders(map);
+            } else if (Objects.requireNonNull(MobiOptionsAdsInit.getDataManger().getLastProvidersShown().get(ADMOB_PROVIDER))) {
+                Map<String, Boolean> map = new HashMap<>();
+                map.put(FACEBOOK_PROVIDER, true);
+                map.put(ADMOB_PROVIDER, false);
+                map.put(UNITY_PROVIDER, false);
+                mobiSetting.setAdsProvider(FACEBOOK_PROVIDER);
+                MobiOptionsAdsInit.setShownProviders(map);
+            } else if (Objects.requireNonNull(MobiOptionsAdsInit.getDataManger().getLastProvidersShown().get(FACEBOOK_PROVIDER))) {
+                Map<String, Boolean> map = new HashMap<>();
+                map.put(FACEBOOK_PROVIDER, false);
+                map.put(ADMOB_PROVIDER, false);
+                map.put(UNITY_PROVIDER, true);
+                mobiSetting.setAdsProvider(UNITY_PROVIDER);
+                MobiOptionsAdsInit.setShownProviders(map);
+            }
+        } else {
+            mobiSetting.setAdsProvider(UNITY_PROVIDER);                 // Show only the unity ads
         }
     }
 
 
-    private void setUpSingleProviders() {
-        mobiSetting.setSingle(true);
+    private void setUpSingleProviders(Context context) {
+        if (isInstalledFromPlayStore(context)) {
+            mobiSetting.setSingle(true);
+        } else {
+            mobiSetting.setSingle(true);
+            mobiSetting.setAdsProvider(UNITY_PROVIDER);                 // Show only the unity ads
+        }
     }
 
 

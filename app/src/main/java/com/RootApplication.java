@@ -1,10 +1,15 @@
 package com;
 
 import android.app.Application;
+import android.util.Log;
 
 
 import com.osama.mobioptionsads.MobiInitializationListener;
 import com.osama.mobioptionsads.MobiOptionsAdsInit;
+import com.osama.mobioptionsads.interstitial.MobiInterstitialListener;
+import com.osama.mobioptionsads.nativeAd.MobiOptionsNativeAd;
+
+import java.util.Collections;
 
 public class RootApplication extends Application {
 
@@ -15,7 +20,13 @@ public class RootApplication extends Application {
 
     public static synchronized void setupMobiOptionsAds(MobiInitializationListener listener) {
         if (mobiOptionsAdsInit == null) {
-            mobiOptionsAdsInit = new MobiOptionsAdsInit(rootApplication, "TJ6N6Wy8aZsc9oWW92TuXlIZwsGtj7", listener);
+            MobiOptionsAdsInit.setAdmobTestDevices(Collections.singletonList("YOU-TEST-DEVICE-ID-PLACED-HERE"));
+            mobiOptionsAdsInit = MobiOptionsAdsInit.build(rootApplication,
+                    "TJ6N6Wy8aZsc9oWW92TuXlIZwsGtj7",
+                    false,                                               // If you set this to false, the list of the test devices will be ignored.
+                    listener);
+        } else if (mobiOptionsAdsInit.isInitialized()) {
+            listener.onInitializationSuccess();
         }
     }
 

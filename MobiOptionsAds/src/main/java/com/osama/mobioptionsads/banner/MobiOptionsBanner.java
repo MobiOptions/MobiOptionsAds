@@ -20,17 +20,12 @@ import com.unity3d.ads.UnityAds;
 import com.unity3d.services.banners.BannerErrorInfo;
 import com.unity3d.services.banners.BannerView;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.osama.mobioptionsads.MobiConstants.ADMOB_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.DEFAULT_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.FACEBOOK_PROVIDER;
-import static com.osama.mobioptionsads.MobiConstants.ROTATION_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.SETTINGS_ADS_ENABLED;
 import static com.osama.mobioptionsads.MobiConstants.TAG;
 import static com.osama.mobioptionsads.MobiConstants.UNITY_PROVIDER;
@@ -101,7 +96,7 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
     }
 
 
-    public MobiOptionsBanner(@NotNull LinearLayout container, MobiOptionsBannerSize size, String adName) {
+    public MobiOptionsBanner(LinearLayout container, MobiOptionsBannerSize size, String adName) {
         this.size = size;
         this.bannerContainer = container;
         this.setupMobiSettings(adName);

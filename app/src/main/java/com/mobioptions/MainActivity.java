@@ -1,5 +1,6 @@
 package com.mobioptions;
 
+import androidx.annotation.LongDef;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
@@ -78,21 +79,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        // You can call this method one time and listen to the initialization
-        // response.
         RootApplication.setupMobiOptionsAds(new MobiInitializationListener() {
             @Override
             public void onInitializationSuccess() {
-                // your setup is done the ads will be displayed
+                Log.d(TAG, "onInitializationSuccess: Initialization done successfully");
                 setUpAllAds();
             }
 
             @Override
             public void onInitializationFailed(String error) {
-                // log the errors
-                Log.d(TAG, "onInitializationFailed: " + error);
+                Log.d(TAG, "onInitializationFailed: Error in the MobiInitialisation, details => " + error);
             }
         });
     }

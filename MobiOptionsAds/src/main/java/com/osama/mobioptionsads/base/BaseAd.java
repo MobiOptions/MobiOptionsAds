@@ -6,41 +6,21 @@ import android.os.Looper;
 import com.osama.mobioptionsads.MobiOptionsAdsInit;
 import com.osama.mobioptionsads.data.remote.model.MobiSetting;
 
-import org.jetbrains.annotations.NotNull;
-
 public abstract class BaseAd {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private MobiSetting mobiSetting = MobiOptionsAdsInit.mobiSetting;
 
-    private boolean isTesting = true;
+    private boolean isTesting = MobiOptionsAdsInit.testingMode;
 
     public boolean isTesting() {
         return isTesting;
     }
 
-    public void setTesting(boolean testing) {
-        isTesting = testing;
-    }
-
-    // facebook video ad => 330311461246322_706645230279608
-    // facebook interstitial ad => 330311461246322_706631666947631
-    // facebook banner ad => IMG_16_9_APP_INSTALL#330311461246322_706629543614510
-    // unity banner id => testing_banner
-    // unity interstitial ad id => interstitial_ad_testing
-    // unity rewarded ad id => rewarded_test_ad
-
     private String bannerId = "IMG_16_9_APP_INSTALL#330311461246322_706629543614510";
     private String rewardedAdId = "330311461246322_706645230279608";
     private String interstitialAdId = "330311461246322_706631666947631";
-
-
-    // the admob test id => ca-app-pub-3940256099942544/2247696110
     private String nativeAdId = "330311461246322_709355306675267";
-
-
-    // unity game id required for the unity interstitial, rewarded ad, and unity banner
-    // unity game id => 3871085
     private String unityGameId = MobiOptionsAdsInit.mobiSetting.getUnityGameId();
 
 
