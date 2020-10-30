@@ -5,6 +5,7 @@ public final class MobiConstants {
     public static final String MOBI_BASE_URL = "https://api.mobioptions.com/api/";
 
     public static final int TWENTY_HOUR_MILLS = 24 * 60 * 60 * 1000;
+    public static final int TIME_UNTIL_THE_APP_IS_STARTED = 5 * 1000;
 
     public static final String TAG = "MobiOptionsAds";
 

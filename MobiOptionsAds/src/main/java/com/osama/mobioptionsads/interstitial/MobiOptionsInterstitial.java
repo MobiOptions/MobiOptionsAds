@@ -83,8 +83,6 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
                 admobInterstitial.setAdListener(this.getAdmobListener());
             } else if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER) && facebookInterstitial != null) {
                 facebookInterstitial.loadAd(facebookInterstitial.buildLoadAdConfig().withAdListener(this.getFacebookListener()).build());
-            } else if (getMobiSetting().getAdsProvider().equals(ROTATION_PROVIDER)) {
-                // TODO: Same as banner
             }
         }, 200);
     }
@@ -104,6 +102,8 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
      * Call this method before setting up a listener for the interstitial
      */
     public void loadAd() {
+        if (!isAppIsAfterDelay())
+            return;
         getHandler().postDelayed(() -> {
             if (getMobiSetting().getAdsEnabled() != SETTINGS_ADS_ENABLED) {
                 Log.d(TAG, "Load ad failed, The ads are disabled from your settings\n" +
@@ -172,7 +172,7 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
             case UNITY_PROVIDER:
                 return UnityAds.isReady(getInterstitialAdId());
         }
-        Log.d(TAG, "isLoaded: None of the sdk was initialised please check your configuration");
+        Log.d(TAG, "None of the sdk was initialised please check your configuration");
         return false;
     }
 

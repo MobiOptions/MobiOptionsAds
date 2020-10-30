@@ -92,6 +92,8 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
     // region public functions
 
     public void load(MobiRewardAdLoadListener rewardAdLoadListener) {
+        if (!isAppIsAfterDelay())
+            return;
         getHandler().postDelayed(() -> {
             if (getMobiSetting().getAdsEnabled() != SETTINGS_ADS_ENABLED) {
                 Log.d(TAG, "Load ad failed, The ads are disabled from your settings\n" +

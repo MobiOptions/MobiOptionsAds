@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -44,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private MobiOptionsNativeAd nativeAd;
 
     private LinearLayout nativeAdContainer;
+
+    private Handler handler = new Handler(Looper.getMainLooper());
 
 
     private final MobiRewardAdListener rewardAdListener = new
@@ -136,27 +140,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // The rewarded ads
-        setUpRewardedAd();
-        rewardedAdButton.setOnClickListener((v) -> {
-            if (rewardedAd.isLoaded()) {
-                rewardedAd.show(rewardAdListener);
-                // load another one
-            } else {
-                Toast.makeText(MainActivity.this, "Ad not loaded yet", Toast.LENGTH_SHORT).show();
-            }
-        });
+        handler.postDelayed(() -> {
+            // The rewarded ads
+            setUpRewardedAd();
+            rewardedAdButton.setOnClickListener((v) -> {
+                if (rewardedAd.isLoaded()) {
+                    rewardedAd.show(rewardAdListener);
+                    // load another one
+                } else {
+                    Toast.makeText(MainActivity.this, "Ad not loaded yet", Toast.LENGTH_SHORT).show();
+                }
+            });
 
-        // interstitial ads
-        setUpInterstitial();
-        interstitialButton.setOnClickListener((v) -> {
-            if (interstitial.isLoaded()) {
-                interstitial.show();
-                // load another one
-            } else {
-                Toast.makeText(MainActivity.this, "Ad not loaded yet", Toast.LENGTH_SHORT).show();
-            }
-        });
+            // interstitial ads
+            setUpInterstitial();
+            interstitialButton.setOnClickListener((v) -> {
+                if (interstitial.isLoaded()) {
+                    interstitial.show();
+                    // load another one
+                } else {
+                    Toast.makeText(MainActivity.this, "Ad not loaded yet", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }, 8000);
 
 
         // Native ads

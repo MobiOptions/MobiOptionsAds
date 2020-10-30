@@ -11,16 +11,21 @@ public abstract class BaseAd {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private MobiSetting mobiSetting = MobiOptionsAdsInit.mobiSetting;
 
-    private boolean isTesting = MobiOptionsAdsInit.testingMode;
+    private final boolean isTesting = MobiOptionsAdsInit.testingMode;
+    private boolean appIsAfterDelay = MobiOptionsAdsInit.appIsStartedAfterDelay;
 
     public boolean isTesting() {
         return isTesting;
     }
 
-    private String bannerId = "IMG_16_9_APP_INSTALL#330311461246322_706629543614510";
-    private String rewardedAdId = "330311461246322_706645230279608";
-    private String interstitialAdId = "330311461246322_706631666947631";
-    private String nativeAdId = "330311461246322_709355306675267";
+    public boolean isAppIsAfterDelay() {
+        return appIsAfterDelay;
+    }
+
+    private String bannerId = "----";
+    private String rewardedAdId = "----";
+    private String interstitialAdId = "----";
+    private String nativeAdId = "----";
     private String unityGameId = MobiOptionsAdsInit.mobiSetting.getUnityGameId();
 
 

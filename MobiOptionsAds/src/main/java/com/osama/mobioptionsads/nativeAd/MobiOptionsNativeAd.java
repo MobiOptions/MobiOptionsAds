@@ -143,7 +143,8 @@ public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener 
                     templateView.setNativeAd(unifiedNativeAd);
                 data.put("an", true);
                 MobiOptionsAdsInit.setAppStats(data);
-            } else if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER) && facebookNativeAd != null) {
+            } else if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER)
+                    && facebookNativeAd != null) {
                 if (facebookNativeAd.isAdLoaded()) {
                     View adView = NativeAdView.render(context, facebookNativeAd);
                     adContainer.addView(adView);
@@ -161,7 +162,6 @@ public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener 
                 unifiedNativeAd.destroy();
         }
     }
-
 
 
     private NativeAdListener getFacebookListener() {
@@ -202,7 +202,7 @@ public class MobiOptionsNativeAd extends BaseAd implements MobiNativeAdListener 
     }
 
 
-    private  AdListener getAdmobListener() {
+    private AdListener getAdmobListener() {
         return new AdListener() {
             @Override
             public void onAdClosed() {

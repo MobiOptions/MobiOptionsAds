@@ -23,7 +23,7 @@ public class RootApplication extends Application {
             MobiOptionsAdsInit.setAdmobTestDevices(Collections.singletonList("YOU-TEST-DEVICE-ID-PLACED-HERE"));
             mobiOptionsAdsInit = MobiOptionsAdsInit.build(rootApplication,
                     "TJ6N6Wy8aZsc9oWW92TuXlIZwsGtj7",
-                    false,                                               // If you set this to false, the list of the test devices will be ignored.
+                    true,                                               // If you set this to false, the list of the test devices will be ignored.
                     listener);
         } else if (mobiOptionsAdsInit.isInitialized()) {
             listener.onInitializationSuccess();

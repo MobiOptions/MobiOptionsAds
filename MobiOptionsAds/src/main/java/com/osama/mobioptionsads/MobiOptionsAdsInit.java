@@ -31,6 +31,7 @@ import static com.facebook.ads.AdSettings.IntegrationErrorMode.INTEGRATION_ERROR
 import static com.osama.mobioptionsads.MobiConstants.ADMOB_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.FACEBOOK_PROVIDER;
 import static com.osama.mobioptionsads.MobiConstants.ROTATION_PROVIDER;
+import static com.osama.mobioptionsads.MobiConstants.TIME_UNTIL_THE_APP_IS_STARTED;
 import static com.osama.mobioptionsads.MobiConstants.UNITY_PROVIDER;
 
 public class MobiOptionsAdsInit {
@@ -42,6 +43,7 @@ public class MobiOptionsAdsInit {
     public static boolean testingMode = false;
     private static boolean isSetUpDone = false;
     private static List<String> admobTestDevices = new ArrayList<>();
+    public static boolean appIsStartedAfterDelay = false;
 
     public boolean isInitialized() {
         return isSetUpDone;
@@ -77,6 +79,7 @@ public class MobiOptionsAdsInit {
                         else
                             setUpSingleProviders(context);
                         isSetUpDone = true;
+                        delayUntilAppRun();
                         Log.d(MobiConstants.TAG, "onResponse: => all data is here");
                     }
                 }
@@ -202,6 +205,11 @@ public class MobiOptionsAdsInit {
         }
     }
 
+
+    private void delayUntilAppRun() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(() -> appIsStartedAfterDelay = true, TIME_UNTIL_THE_APP_IS_STARTED);
+    }
 
     private void setAppLaunched() {
         handler.post(() -> {
