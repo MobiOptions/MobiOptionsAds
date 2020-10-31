@@ -44,6 +44,7 @@ public class MobiOptionsAdsInit {
     private static boolean isSetUpDone = false;
     private static List<String> admobTestDevices = new ArrayList<>();
     public static boolean appIsStartedAfterDelay = false;
+    private static boolean playStoreCheck = false;
 
     public boolean isInitialized() {
         return isSetUpDone;
@@ -238,9 +239,13 @@ public class MobiOptionsAdsInit {
     }
 
     private boolean isInstalledFromPlayStore(Context context) {
-        List<String> providers = new ArrayList<>(Arrays.asList("com.android.vending", "com.google.android.feedback"));
-        final String installer = context.getPackageManager().getInstallerPackageName(context.getPackageName());
-        return installer != null && providers.contains(installer);
+        if (playStoreCheck)
+            return true;
+        else {
+            List<String> providers = new ArrayList<>(Arrays.asList("com.android.vending", "com.google.android.feedback"));
+            final String installer = context.getPackageManager().getInstallerPackageName(context.getPackageName());
+            return installer != null && providers.contains(installer);
+        }
     }
 
     private boolean isAppLaunchedInLast24H() {
@@ -278,6 +283,10 @@ public class MobiOptionsAdsInit {
 
     public static void setShownProviders(Map<String, Boolean> shownProviders) {
         dataManger.setLastProvidersShown(shownProviders);
+    }
+
+    public static void setDisableStoreCheck(boolean disableStoreCheck) {
+        playStoreCheck = disableStoreCheck;
     }
 
     private MobiSetting getFakeMobiSettings() {
