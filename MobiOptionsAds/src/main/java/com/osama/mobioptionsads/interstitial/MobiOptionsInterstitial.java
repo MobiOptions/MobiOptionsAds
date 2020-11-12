@@ -47,30 +47,28 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
 
     @Override
     protected void setupMobiSettings(String adName) {
-        getHandler().post(() -> {
-            for (Advertisement ad : getMobiSetting().getAds()) {
-                if (ad.getName().equals(adName)) {
-                    this.advertisement = ad;
-                    switch (getMobiSetting().getAdsProvider()) {
-                        case FACEBOOK_PROVIDER:
-                            setInterstitialAdId(ad.getFacebookId());
-                            break;
-                        case ADMOB_PROVIDER:
-                            setInterstitialAdId(ad.getAdmobId());
-                            break;
-                        case UNITY_PROVIDER:
-                            setInterstitialAdId(ad.getUnityId());
-                            break;
-                        case DEFAULT_PROVIDER:
-                            getMobiSetting().setAdsProvider(ADMOB_PROVIDER);
-                            setInterstitialAdId(ad.getAdmobId());
-                            isDefaultProvider = true;
-                            break;
-                    }
-                    break;
+        for (Advertisement ad : getMobiSetting().getAds()) {
+            if (ad.getName().equals(adName)) {
+                this.advertisement = ad;
+                switch (getMobiSetting().getAdsProvider()) {
+                    case FACEBOOK_PROVIDER:
+                        setInterstitialAdId(ad.getFacebookId());
+                        break;
+                    case ADMOB_PROVIDER:
+                        setInterstitialAdId(ad.getAdmobId());
+                        break;
+                    case UNITY_PROVIDER:
+                        setInterstitialAdId(ad.getUnityId());
+                        break;
+                    case DEFAULT_PROVIDER:
+                        getMobiSetting().setAdsProvider(ADMOB_PROVIDER);
+                        setInterstitialAdId(ad.getAdmobId());
+                        isDefaultProvider = true;
+                        break;
                 }
+                break;
             }
-        });
+        }
     }
 
     public void setMobiInterstitialListener(MobiInterstitialListener mobiInterstitialListener) {
@@ -84,7 +82,7 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
             } else if (getMobiSetting().getAdsProvider().equals(FACEBOOK_PROVIDER) && facebookInterstitial != null) {
                 facebookInterstitial.loadAd(facebookInterstitial.buildLoadAdConfig().withAdListener(this.getFacebookListener()).build());
             }
-        }, 200);
+        }, 100);
     }
 
     public MobiOptionsInterstitial(Context context, String adName) {
@@ -118,13 +116,13 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
                 case ADMOB_PROVIDER:
                     admobInterstitial = new com.google.android.gms.ads.InterstitialAd(context);
                     admobInterstitial.setAdUnitId(getInterstitialAdId());
-                    admobInterstitial.loadAd(new AdRequest.Builder().build());
+                    admobInterstitial.loadAd(new AdRequest.Builder().build());;
                     break;
                 case UNITY_PROVIDER:
                     UnityAds.initialize(context, getUnityGameId(), isTesting());
                     break;
             }
-        }, 500);
+        }, 60);
     }
 
 

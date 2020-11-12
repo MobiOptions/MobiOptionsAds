@@ -54,30 +54,28 @@ public class MobiOptionRewardedAd extends BaseAd implements MobiRewardAdLoadList
 
     @Override
     protected void setupMobiSettings(String adName) {
-        getHandler().post(() -> {
-            for (Advertisement ad : getMobiSetting().getAds()) {
-                if (ad.getName().equals(adName)) {
-                    this.advertisement = ad;
-                    switch (getMobiSetting().getAdsProvider()) {
-                        case FACEBOOK_PROVIDER:
-                            setRewardedAdId(ad.getFacebookId());
-                            break;
-                        case ADMOB_PROVIDER:
-                            setRewardedAdId(ad.getAdmobId());
-                            break;
-                        case UNITY_PROVIDER:
-                            setRewardedAdId(ad.getUnityId());
-                            break;
-                        case DEFAULT_PROVIDER:
-                            getMobiSetting().setAdsProvider(ADMOB_PROVIDER);
-                            isDefaultProvider = true;
-                            setRewardedAdId(ad.getAdmobId());
-                            break;
-                    }
-                    break;
+        for (Advertisement ad : getMobiSetting().getAds()) {
+            if (ad.getName().equals(adName)) {
+                this.advertisement = ad;
+                switch (getMobiSetting().getAdsProvider()) {
+                    case FACEBOOK_PROVIDER:
+                        setRewardedAdId(ad.getFacebookId());
+                        break;
+                    case ADMOB_PROVIDER:
+                        setRewardedAdId(ad.getAdmobId());
+                        break;
+                    case UNITY_PROVIDER:
+                        setRewardedAdId(ad.getUnityId());
+                        break;
+                    case DEFAULT_PROVIDER:
+                        getMobiSetting().setAdsProvider(ADMOB_PROVIDER);
+                        isDefaultProvider = true;
+                        setRewardedAdId(ad.getAdmobId());
+                        break;
                 }
+                break;
             }
-        });
+        }
     }
 
     public MobiOptionRewardedAd(Context context, String adName) {

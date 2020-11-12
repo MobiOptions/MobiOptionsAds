@@ -1,6 +1,5 @@
 package com.mobioptions;
 
-import androidx.annotation.LongDef;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
@@ -49,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Handler handler = new Handler(Looper.getMainLooper());
 
+    AppCompatButton interstitialButton;
+
 
     private final MobiRewardAdListener rewardAdListener = new
             MobiRewardAdListener() {
@@ -83,11 +84,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        interstitialButton = findViewById(R.id.show_interstitial);
+
         RootApplication.setupMobiOptionsAds(new MobiInitializationListener() {
             @Override
             public void onInitializationSuccess() {
                 Log.d(TAG, "onInitializationSuccess: Initialization done successfully");
-                setUpAllAds();
+//                setUpAllAds();
+                handler.postDelayed(() -> setUpInterstitial(), 7000);
             }
 
             @Override
@@ -100,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpAllAds() {
         LinearLayout bannerContainer = findViewById(R.id.banner_container);
-        AppCompatButton interstitialButton = findViewById(R.id.show_interstitial);
         AppCompatButton rewardedAdButton = findViewById(R.id.show_rewarded_ad);
 
         nativeAdContainer = findViewById(R.id.native_ad_container);
@@ -151,17 +155,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Ad not loaded yet", Toast.LENGTH_SHORT).show();
                 }
             });
-
-            // interstitial ads
-            setUpInterstitial();
-            interstitialButton.setOnClickListener((v) -> {
-                if (interstitial.isLoaded()) {
-                    interstitial.show();
-                    // load another one
-                } else {
-                    Toast.makeText(MainActivity.this, "Ad not loaded yet", Toast.LENGTH_SHORT).show();
-                }
-            });
         }, 8000);
 
 
@@ -171,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setUpInterstitial() {
-        interstitial = new MobiOptionsInterstitial(this, "Interstitial_2");
+        interstitial = new MobiOptionsInterstitial(this, "Interstitial_0");
         interstitial.loadAd();
         interstitial.setMobiInterstitialListener(new MobiInterstitialListener() {
             @Override
@@ -199,6 +192,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClicked(String adsProvider) {
 
+            }
+        });
+
+        interstitialButton.setOnClickListener((v) -> {
+            if (interstitial.isLoaded()) {
+                interstitial.show();
+                interstitial.loadAd();
+            } else {
+                Toast.makeText(MainActivity.this, "Ad not loaded yet", Toast.LENGTH_SHORT).show();
             }
         });
     }
