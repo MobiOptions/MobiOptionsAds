@@ -116,7 +116,7 @@ public class MobiOptionsInterstitial extends BaseAd implements MobiInterstitialL
                 case ADMOB_PROVIDER:
                     admobInterstitial = new com.google.android.gms.ads.InterstitialAd(context);
                     admobInterstitial.setAdUnitId(getInterstitialAdId());
-                    admobInterstitial.loadAd(new AdRequest.Builder().build());;
+                    admobInterstitial.loadAd(new AdRequest.Builder().build());
                     break;
                 case UNITY_PROVIDER:
                     UnityAds.initialize(context, getUnityGameId(), isTesting());

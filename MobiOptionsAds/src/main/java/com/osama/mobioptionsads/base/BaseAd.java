@@ -12,14 +12,13 @@ public abstract class BaseAd {
     private MobiSetting mobiSetting = MobiOptionsAdsInit.mobiSetting;
 
     private final boolean isTesting = MobiOptionsAdsInit.testingMode;
-    private boolean appIsAfterDelay = MobiOptionsAdsInit.appIsStartedAfterDelay;
 
     public boolean isTesting() {
         return isTesting;
     }
 
     public boolean isAppIsAfterDelay() {
-        return appIsAfterDelay;
+        return MobiOptionsAdsInit.appIsStartedAfterDelay;
     }
 
     private String bannerId = "----";
