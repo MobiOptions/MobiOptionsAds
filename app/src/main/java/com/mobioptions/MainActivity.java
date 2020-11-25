@@ -91,8 +91,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onInitializationSuccess() {
                 Log.d(TAG, "onInitializationSuccess: Initialization done successfully");
-//                setUpAllAds();
-                handler.postDelayed(() -> setUpInterstitial(), 7000);
+                setUpAllAds();
+//                handler.postDelayed(() -> setUpInterstitial(), 7000);
             }
 
             @Override
@@ -145,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         handler.postDelayed(() -> {
+
+            setUpInterstitial();
+
             // The rewarded ads
             setUpRewardedAd();
             rewardedAdButton.setOnClickListener((v) -> {
@@ -164,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setUpInterstitial() {
-        interstitial = new MobiOptionsInterstitial(this, "Interstitial_0");
+        interstitial = new MobiOptionsInterstitial(this, "Interstitial_2");
         interstitial.loadAd();
         interstitial.setMobiInterstitialListener(new MobiInterstitialListener() {
             @Override

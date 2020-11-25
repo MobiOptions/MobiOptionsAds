@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
+import okhttp3.logging.LoggingEventListener;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

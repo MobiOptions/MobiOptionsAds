@@ -70,7 +70,10 @@ public class MobiOptionsAdsInit {
                         isSetUpDone = false;
                     } else if (apiResponse.getMobiSetting() != null) {
                         mobiSetting = apiResponse.getMobiSetting();
+
                         dataManger.setAppToken(apiResponse.getMobiSetting().getToken());
+                        dataManger.setProjectId(apiResponse.getMobiSetting().getId());
+
                         if (dataManger.getLaunchedFirstTime())
                             setAppLaunchedFirstTime(context);
                         setupSDKs(context);
@@ -137,7 +140,7 @@ public class MobiOptionsAdsInit {
     private void setAppLaunchedFirstTime(Context context) {
         handler.post(() -> {
             Map<String, Object> fields = new HashMap<>();
-            fields.put("ads_projects_id", dataManger.getAppToken());
+            fields.put("ads_projects_id", dataManger.getProjectId());
             if (isInstalledFromPlayStore(context))
                 fields.put("playstore", true);
             Call<ApiResponse> apiResponseCall = dataManger.setAppLaunchedFirstTime(fields);
@@ -215,7 +218,7 @@ public class MobiOptionsAdsInit {
     private void setAppLaunched() {
         handler.post(() -> {
             Map<String, Object> fields = new HashMap<>();
-            fields.put("ads_projects_id", dataManger.getAppToken());
+            fields.put("ads_projects_id", dataManger.getProjectId());
             if (isAppLaunchedInLast24H()) {
                 dataManger.setAppLaunchedAt(System.currentTimeMillis());
                 fields.put("unique", true);
@@ -265,7 +268,7 @@ public class MobiOptionsAdsInit {
     public static void setAppStats(Map<String, Object> fields) {
         Handler handlerOne = new Handler(Looper.getMainLooper());
         handlerOne.post(() -> {
-            fields.put("ads_projects_id", dataManger.getAppToken());
+            fields.put("ads_projects_id", dataManger.getProjectId());
             Call<ApiResponse> apiResponseCall = dataManger.setAdsStats(fields);
             apiResponseCall.enqueue(new Callback<ApiResponse>() {
                 @Override

@@ -23,7 +23,7 @@ public class RootApplication extends Application {
             MobiOptionsAdsInit.setAdmobTestDevices(Collections.singletonList("YOU-TEST-DEVICE-ID-PLACED-HERE"));
             MobiOptionsAdsInit.setDisableStoreCheck(true);                                                          // true to simulate the play sotre behaviour
             mobiOptionsAdsInit = MobiOptionsAdsInit.build(rootApplication,
-                    "Wc2RO1wTGYDvtR4bfaxK2ZABoAxFg1",               // TJ6N6Wy8aZsc9oWW92TuXlIZwsGtj7
+                    "59VXT7z2sIUcjY8h8KSU9nYJuWvSiU",               // TJ6N6Wy8aZsc9oWW92TuXlIZwsGtj7
                     true,                                               // If you set this to false, the list of the test devices will be ignored.
                     listener);
         } else if (mobiOptionsAdsInit.isInitialized()) {

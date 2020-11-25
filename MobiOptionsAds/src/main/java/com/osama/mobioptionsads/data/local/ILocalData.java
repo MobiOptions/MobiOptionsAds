@@ -26,4 +26,8 @@ public interface ILocalData {
     void setLastProvidersShown(Map<String, Boolean> map);
 
     Map<String, Boolean> getLastProvidersShown();
+
+    void setProjectId(int projectId);
+
+    int getProjectId();
 }

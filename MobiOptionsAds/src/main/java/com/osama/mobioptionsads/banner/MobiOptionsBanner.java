@@ -151,7 +151,7 @@ public class MobiOptionsBanner extends BaseAd implements MobiBannerListener {
                     MobiOptionsAdsInit.setAppStats(data);
                     break;
             }
-        }, 100);
+        }, 40);
     }
 
 

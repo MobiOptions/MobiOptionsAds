@@ -89,4 +89,14 @@ public class DataManger implements IDataManager {
     public Map<String, Boolean> getLastProvidersShown() {
         return localData.getLastProvidersShown();
     }
+
+    @Override
+    public void setProjectId(int projectId) {
+        localData.setProjectId(projectId);
+    }
+
+    @Override
+    public int getProjectId() {
+        return localData.getProjectId();
+    }
 }

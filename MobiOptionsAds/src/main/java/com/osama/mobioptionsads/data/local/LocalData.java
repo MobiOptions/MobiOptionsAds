@@ -16,6 +16,7 @@ public class LocalData implements ILocalData {
     private static final String SHARED_PRES_NAME = "mobioptionsads.Prefs";
     public static final String APP_LAUNCHED_FIRST_TIME = "mobioptionsads.Launched_First_Time";
     public static final String APP_TOKEN = "mobioptionsads.App_Token";
+    public static final String APP_ID = "mobioptionsads.App_Id";
     public static final String APP_LAUNCHED_AT = "mobioptionsads.App_Launched_At";
     public static final String APP_LAUNCHED_TIMES = "mobioptionsads.App_Launched_For";
 
@@ -84,5 +85,15 @@ public class LocalData implements ILocalData {
         map.put(MobiConstants.UNITY_PROVIDER, sharedPreferences.getBoolean(UNITY_PROVIDER_KEY, false));
         map.put(MobiConstants.ADMOB_PROVIDER, sharedPreferences.getBoolean(ADMOB_PROVIDER_KEY, false));
         return map;
+    }
+
+    @Override
+    public void setProjectId(int projectId) {
+        sharedPreferences.edit().putInt(APP_ID, projectId).apply();
+    }
+
+    @Override
+    public int getProjectId() {
+        return sharedPreferences.getInt(APP_ID, 0);
     }
 }
