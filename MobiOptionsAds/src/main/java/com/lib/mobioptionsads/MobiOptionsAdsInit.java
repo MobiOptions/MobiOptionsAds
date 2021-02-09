@@ -133,6 +133,7 @@ public class MobiOptionsAdsInit {
                         .Builder()
                         .setTestDeviceIds(admobTestDevices).build();
                 MobileAds.setRequestConfiguration(requestConfiguration);
+                AdSettings.setTestMode(true);
             }
         });
     }
