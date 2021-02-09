@@ -1,13 +1,10 @@
 package com;
 
 import android.app.Application;
-import android.util.Log;
 
 
-import com.osama.mobioptionsads.MobiInitializationListener;
-import com.osama.mobioptionsads.MobiOptionsAdsInit;
-import com.osama.mobioptionsads.interstitial.MobiInterstitialListener;
-import com.osama.mobioptionsads.nativeAd.MobiOptionsNativeAd;
+import com.lib.mobioptionsads.MobiInitializationListener;
+import com.lib.mobioptionsads.MobiOptionsAdsInit;
 
 import java.util.Collections;
 
